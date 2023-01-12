@@ -10,7 +10,7 @@ class Game():
     def make_move(self):
         pass
     # return valid move and board after making a move.
-    # contains a subroutine which returns all possible valid moves
+    # contains a subroutine which returns all possible valid moves!
 
     # //
     def start_game(self):
