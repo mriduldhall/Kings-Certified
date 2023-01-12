@@ -16,11 +16,10 @@ class Game():
     def start_game(self):
         pass
 
-    # //
+    # Arya
     def players(self):
         pass
-    # 2
 
-    # //
+    # Shenglun
     def robot(self):
         pass
