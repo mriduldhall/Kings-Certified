@@ -1,4 +1,4 @@
-class Game():
+class Game:
     def __int__(self):
         self.board = [[]]  # 5 x 6 array
 
