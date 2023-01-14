@@ -6,11 +6,11 @@ class Game:
     def __init__(self):
         self.row = 5
         self.column = 6
-        self.board = [[0 for _ in range(self.column)] for _ in range(self.row)]
         # These can be changed later to more appropriate value
         self.empty_position = 0
         self.player1_marker = 1
         self.player2_marker = 2
+        self.board = [[self.empty_position for _ in range(self.column)] for _ in range(self.row)]
 
     def valid_move(self):
         """
