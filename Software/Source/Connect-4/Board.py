@@ -18,12 +18,42 @@ class Board:
     # Haroon
     # Returns a list of all valid columns where moves can be made
     def get_valid_moves(self):
-        pass
+        """
+        :return: columns_available: list with the index of columns where move is available.
+        """
+        columns_available = []
+        for column in range(self.number_of_columns):
+            if self.grid[0][column] == self.empty_marker:
+                columns_available.append(column)
+        return columns_available
 
     # Haroon
     # Makes a move when given column and player number
-    def make_move(self, column_number, player_number):
-        pass
+    def make_move(self, column_number, player_marker):
+        """
+        :param column_number: (computer) index of the column you want to make move in
+        :param player_marker: the player mark you want to put in that column
+        :return: True: if the move made successfully; else: False
+        """
+        assert column_number in self.get_valid_moves(), 'Move Request Should Be Valid!'
+
+        grid_row_size = self.number_of_rows - 1  # Computer based indexing
+        row = grid_row_size // 2
+        made_move, ascending = False, False
+        while not made_move:
+            if self.grid[row][column_number] != self.empty_marker:
+                row -= 1
+                ascending = True
+            elif self.grid[row][column_number] == self.empty_marker and row < grid_row_size and not ascending:
+                row += 1
+            else:
+                self.grid[row][column_number] = player_marker
+                made_move = True
+
+        # for debugging purposes to make sure move was made correctly
+        assert made_move, f'error while making the move in {column_number} column for {player_marker}'
+
+        return made_move
 
     # Mridul
     # Checks if game is over and returns player number if won or False if game is still ongoing
