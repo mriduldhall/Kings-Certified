@@ -6,7 +6,7 @@ class Game:
     def check_victory(self, move):
         pass
 
-    # Haroon
+    # Haroo
     def make_move(self):
         pass
     # return valid move and board after making a move.
