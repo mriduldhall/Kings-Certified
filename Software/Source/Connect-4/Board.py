@@ -1,13 +1,15 @@
 class Board:
-    def __init__(self, rows, columns, empty, player_1, player_2):
+    def __init__(self, rows, columns, empty, player_1, player_2, robot):
         self.number_of_rows = rows
         self.number_of_columns = columns
         self.empty_marker = empty
         self.player_1_marker = player_1
         self.player_2_marker = player_2
+        self.robot_marker = robot
         self.player_number_to_marker = {
             "1": self.player_1_marker,
             "2": self.player_2_marker,
+            "R": self.robot_marker,
         }
         self.grid = [
             [
