@@ -1,9 +1,10 @@
 from Board import Board
+import random
 
 
 class Game:
     def __init__(self, rows=6, columns=7, empty=0, player_1=1, player_2=2):
-        self.board = Board(rows, columns, empty, player_1, player_2)
+        self.board = Board(rows, columns, empty, player_1, player_2, "R")
 
     def input_validation(self, user_input, data_type):
         try:
@@ -17,7 +18,7 @@ class Game:
     def print_board(self):
         print('   |   '.join([str(column) for column in [col for col in range(self.board.number_of_columns)]]))
         print("".join(['-' for i in range(self.board.number_of_columns*7)]))
-        print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.board.grid]))
+        print('\n'.join(['       '.join([str(cell) for cell in row]) for row in self.board.grid]))
 
     # Shenglun
     # Allows a human player to make a move when given the player number who is about to make a move
@@ -30,7 +31,7 @@ class Game:
         column = (input(f"Enter column (0 - {max_column}): "))  # Validator
         marker = self.board.player_number_to_marker[player_number]
 
-        while (not self.input_validation(column, int) or (int(column) not in self.board.get_valid_moves())):
+        while not self.input_validation(column, int) or (int(column) not in self.board.get_valid_moves()):
             print("Invalid move.")
             column = input(f"Enter column (0 - {max_column}): ")
 
