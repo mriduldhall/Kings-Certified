@@ -17,7 +17,7 @@ class Game:
     # Prints the board in its current status
     def print_board(self):
         print('   |   '.join([str(column) for column in [col for col in range(self.board.number_of_columns)]]))
-        print("".join(['-' for i in range(self.board.number_of_columns*7)]))
+        print("".join(['-' for _ in range(self.board.number_of_columns*7)]))
         print('\n'.join(['       '.join([str(cell) for cell in row]) for row in self.board.grid]))
 
     # Shenglun
@@ -36,7 +36,6 @@ class Game:
             column = input(f"Enter column (0 - {max_column}): ")
 
         self.board.make_move(int(column), marker)
-        self.print_board()
 
     # Shenglun
     # Allows the robot to make a move
@@ -44,7 +43,6 @@ class Game:
         column = random.choice(self.board.get_valid_moves())
         marker = self.board.player_number_to_marker["R"]
         self.board.make_move(column, marker)
-        self.print_board()
 
     # Arya
     # Allows user to choose if they want PvP or PvR and then calls other methods as needed to make moves

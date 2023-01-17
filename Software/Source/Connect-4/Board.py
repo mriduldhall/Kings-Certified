@@ -7,8 +7,8 @@ class Board:
         self.player_2_marker = player_2
         self.robot_marker = robot
         self.player_number_to_marker = {
-            "1": self.player_1_marker,
-            "2": self.player_2_marker,
+            1: self.player_1_marker,
+            2: self.player_2_marker,
             "R": self.robot_marker,
         }
         self.grid = [
