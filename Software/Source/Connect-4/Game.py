@@ -1,5 +1,5 @@
 from Board import Board
-import random
+from random import choice
 
 
 class Game:
@@ -45,21 +45,13 @@ class Game:
     # Shenglun
     # Allows the robot to make a move
     def make_robot_move(self):
-        column = random.choice(self.board.get_valid_moves())
+        column = choice(self.board.get_valid_moves())
         marker = self.board.player_number_to_marker["R"]
         self.board.make_move(column, marker)
 
     # Arya
     # Allows user to choose if they want PvP or PvR and then calls other methods as needed to make moves
     def play_game(self):
-        """
-        is_player_game  - binary value for if game is between robot and player or player and player
-        p1_first_play   - binary value for if the first go is player 1 or not player 1
-        current_turn    - binary value for if the next player is player 1 or not player 1
-                          if it is not player 1 then is_player_game is used to determine the next turn
-        winner          - binary value for the last players turn
-                          if not player 1 then is_player_game is used to determine winner
-        """
         is_player_game = input("Play against Robot or another Player: \n 1 for player \n 0 for robot\n")
         # input validation
         while not (str(is_player_game) == "0" or str(is_player_game) == "1"):
@@ -79,8 +71,7 @@ class Game:
         current_turn = p1_first_play
 
         # looping through the turns
-        while not int(input("Has someone won yet? 1/0")):
-            """not Board.check_victory(victory)"""
+        while not self.board.check_victory():
             self.print_board()
 
             if current_turn == 1:
@@ -111,5 +102,5 @@ class Game:
             print("Robot wins")
 
 
-current_game = Game(6, 7, " ", 1, 2)
-Game.play_game(current_game)
+if __name__ == '__main__':
+    Game().play_game()

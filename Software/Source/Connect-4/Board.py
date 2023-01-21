@@ -57,7 +57,54 @@ class Board:
 
         return made_move
 
+    def check_coordinate_validity(self, coordinate):
+        """
+        :param coordinate: potential coordinate that needs to be verified for validity
+        :return: True: if the coordinate is valid; else: False
+        """
+        if (0 <= coordinate[0] < self.number_of_rows) and (0 <= coordinate[1] < self.number_of_columns):
+            return True
+        return False
+
     # Mridul
     # Checks if game is over and returns player number if won or False if game is still ongoing
     def check_victory(self):
-        pass
+        """
+        :return: True: if the game has been won; else: False
+        """
+        test = {
+            "column": [1, 0],
+            "row": [0, 1],
+            "diagonal_1": [1, 1],
+            "diagonal_2": [1, -1],
+        }
+        coordinates = []
+        for column_index in range(3, self.number_of_columns, 4):
+            for row_index in range(self.number_of_rows):
+                if self.grid[row_index][column_index]:
+                    coordinates.append([row_index, column_index])
+        for column_index in range(self.number_of_columns):
+            for row_index in range(3, self.number_of_rows, 4):
+                if (self.grid[row_index][column_index]) and ([row_index, column_index] not in coordinates):
+                    coordinates.append([row_index, column_index])
+        for coordinate in coordinates:
+            marker = self.grid[coordinate[0]][coordinate[1]]
+            for pattern in test.values():
+                positive = True
+                connected = []
+                for _ in range(2):
+                    row_check = coordinate[0]
+                    column_check = coordinate[1]
+                    while (self.check_coordinate_validity([row_check, column_check])) and (self.grid[row_check][column_check] == marker):
+                        if [row_check, column_check] not in connected:
+                            connected.append([row_check, column_check])
+                        if positive:
+                            row_check += pattern[0]
+                            column_check += pattern[1]
+                        else:
+                            row_check -= pattern[0]
+                            column_check -= pattern[1]
+                    positive = False
+                if len(connected) >= 4:
+                    return True
+        return False
