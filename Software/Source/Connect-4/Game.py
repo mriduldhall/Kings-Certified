@@ -1,22 +1,11 @@
 from Board import Board
+from Validator import Validator
 from random import choice
 
 
 class Game:
     def __init__(self, rows=6, columns=7, empty=0, player_1=1, player_2=2):
         self.board = Board(rows, columns, empty, player_1, player_2, "R")
-
-    def input_validation(self, user_input, data_type):
-        """
-        :param user_input: the value to be checked
-        :param data_type: the data type to compare the checked value with
-        :return: true or false if the value have the corresponding data type
-        """
-        try:
-            data_type(user_input)
-            return True
-        except ValueError:
-            return False
 
     def print_board(self):
         print('   |   '.join([str(column) for column in [col for col in range(self.board.number_of_columns)]]))
@@ -32,7 +21,7 @@ class Game:
         column = (input(f"Enter column (0 - {max_column}): "))
         marker = self.board.player_number_to_marker[player_number]
 
-        while not self.input_validation(column, int) or (int(column) not in self.board.get_valid_moves()):
+        while not Validator(column).type_validation(int) or (int(column) not in self.board.get_valid_moves()):
             print("Invalid move.")
             column = input(f"Enter column (0 - {max_column}): ")
 
@@ -45,13 +34,13 @@ class Game:
 
     def play_game(self):
         is_player_game = input("Play against Robot or another Player: \n 1 for player \n 0 for robot\n")
-        while not (str(is_player_game) == "0" or str(is_player_game) == "1"):
+        while not Validator(is_player_game).option_validator(["0", "1"]):
             is_player_game = input("Error. Please input 1 or 0. \n"
                                    "Play against Robot or another Player: \n"
                                    " 1 for player \n 0 for robot\n")
 
         p1_first_play = input("Who plays first? \n 1 - I start first \n 0 - Opponent starts\n")
-        while not (str(p1_first_play) == "0" or str(p1_first_play) == "1"):
+        while not Validator(p1_first_play).option_validator(["0", "1"]):
             p1_first_play = input("Error. Please input 1 or 0. \n"
                                   "Who plays first: \n"
                                   " 1 - I start first \n 0 - Opponent starts\n")

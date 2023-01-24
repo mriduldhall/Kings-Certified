@@ -1,3 +1,6 @@
+from Validator import Validator
+
+
 class Board:
     def __init__(self, rows, columns, empty, player_1, player_2, robot):
         self.number_of_rows = rows
@@ -52,15 +55,6 @@ class Board:
 
         return made_move
 
-    def check_coordinate_validity(self, coordinate):
-        """
-        :param coordinate: potential coordinate that needs to be verified for validity
-        :return: True: if the coordinate is valid; else: False
-        """
-        if (0 <= coordinate[0] < self.number_of_rows) and (0 <= coordinate[1] < self.number_of_columns):
-            return True
-        return False
-
     def check_victory(self):
         """
         :return: True: if the game has been won; else: False
@@ -88,7 +82,9 @@ class Board:
                 for _ in range(2):
                     row_check = coordinate[0]
                     column_check = coordinate[1]
-                    while (self.check_coordinate_validity([row_check, column_check])) and (self.grid[row_check][column_check] == marker):
+                    while (Validator(row_check).range_validator(0, self.number_of_rows, equal_to_start=True) and
+                           Validator(column_check).range_validator(0, self.number_of_columns, equal_to_start=True)) and \
+                            (self.grid[row_check][column_check] == marker):
                         if [row_check, column_check] not in connected:
                             connected.append([row_check, column_check])
                         if positive:
