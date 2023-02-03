@@ -2,7 +2,7 @@ from Validator import Validator
 
 
 class Board:
-    def __init__(self, rows, columns, empty, player_1, player_2, robot):
+    def __init__(self, rows, columns, empty, player_1, player_2, robot, grid=None):
         self.number_of_rows = rows
         self.number_of_columns = columns
         self.empty_marker = empty
@@ -14,7 +14,10 @@ class Board:
             2: self.player_2_marker,
             "R": self.robot_marker,
         }
-        self.grid = [[self.empty_marker for _ in range(self.number_of_columns)] for _ in range(self.number_of_rows)]
+        if not grid:
+            self.grid = [[self.empty_marker for _ in range(self.number_of_columns)] for _ in range(self.number_of_rows)]
+        else:
+            self.grid = grid
 
     def get_valid_moves(self):
         """
@@ -91,5 +94,9 @@ class Board:
                             column_check -= pattern[1]
                     positive = False
                 if len(connected) >= 4:
-                    return True
-        return False
+                    return True, self.player_number_to_marker[marker]
+        return False, None
+
+
+
+

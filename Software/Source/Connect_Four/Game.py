@@ -53,7 +53,8 @@ class Game:
         p1_first_play = int(p1_first_play)
         current_turn = p1_first_play
 
-        while not self.board.check_victory() and (len(self.board.get_valid_moves()) > 0):
+
+        while not self.board.check_victory()[0] and (len(self.board.get_valid_moves()) > 0):
             self.print_board()
             print("")
 
@@ -79,7 +80,7 @@ class Game:
 
         winner = not current_turn
 
-        if not self.board.get_valid_moves() and not self.board.check_victory():
+        if not self.board.get_valid_moves() and not self.board.check_victory()[0]:
             print("Draw")
         elif winner:
             print("Player 1 wins")
@@ -91,3 +92,4 @@ class Game:
 
 if __name__ == '__main__':
     Game().play_game()
+
