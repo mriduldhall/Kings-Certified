@@ -14,11 +14,7 @@ class Board:
             2: self.player_2_marker,
             "R": self.robot_marker,
         }
-        self.grid = [
-            [
-                self.empty_marker for _ in range(self.number_of_columns)
-            ] for _ in range(self.number_of_rows)
-        ]
+        self.grid = [[self.empty_marker for _ in range(self.number_of_columns)] for _ in range(self.number_of_rows)]
 
     def get_valid_moves(self):
         """

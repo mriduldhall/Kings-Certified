@@ -39,23 +39,27 @@ class Game:
                                    "Play against Robot or another Player: \n"
                                    " 1 for player \n 0 for robot\n")
 
+        print("")
+
         p1_first_play = input("Who plays first? \n 1 - I start first \n 0 - Opponent starts\n")
         while not Validator(p1_first_play).option_validator(["0", "1"]):
             p1_first_play = input("Error. Please input 1 or 0. \n"
                                   "Who plays first: \n"
                                   " 1 - I start first \n 0 - Opponent starts\n")
 
+        print("")
+
         is_player_game = int(is_player_game)
         p1_first_play = int(p1_first_play)
         current_turn = p1_first_play
 
-        while not self.board.check_victory():
+        while not self.board.check_victory() and (len(self.board.get_valid_moves()) > 0):
             self.print_board()
+            print("")
 
             if current_turn == 1:
                 print("Player 1 turn:")
                 self.make_player_move(1)
-                self.print_board()
                 current_turn = 0
 
             elif current_turn == 0 and is_player_game:
@@ -71,8 +75,13 @@ class Game:
             else:
                 print("Error")
 
+        self.print_board()
+
         winner = not current_turn
-        if winner:
+
+        if not self.board.get_valid_moves() and not self.board.check_victory():
+            print("Draw")
+        elif winner:
             print("Player 1 wins")
         elif is_player_game:
             print("Player 2 wins")
