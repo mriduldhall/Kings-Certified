@@ -3,16 +3,16 @@ from copy import deepcopy
 
 
 class Minimax:
-    def __init__(self, maximising_marker, minimising_marker, game_setup_arguments, is_maximising=True):
+    def __init__(self, maximising_marker, minimising_marker, game_setup_arguments):
         self.maximising_marker = maximising_marker
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
-        self.is_maximising = is_maximising
+        # self.is_maximising = is_maximising
 
     def minimax(self, state, is_maximising):
-        if (score := self.evaluate(state[0], is_maximising)) is not None:
+        if (score := self.evaluate(state[0])) is not None:
             return score, state[1]
-        return (max if self.is_maximising else min)(
+        return (max if is_maximising else min)(
             self.minimax(state_info, not is_maximising)
             for state_info in self.possible_new_states(state[0], not is_maximising)
         )
@@ -41,11 +41,10 @@ class Minimax:
 
         return possible_states
 
-    def evaluate(self, state, is_maximising):
+    def evaluate(self, state):
         current_board = Board(*self.game_setup_arguments, state)
-        player_marker = self.maximising_marker if is_maximising else self.minimising_marker
         if current_board.check_victory()[0]:
-            if current_board.check_victory()[1] == player_marker:
+            if current_board.check_victory()[1] == self.maximising_marker:
                 return 1
             else:
                 return -1
