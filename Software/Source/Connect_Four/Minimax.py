@@ -14,7 +14,7 @@ class Minimax:
             return score, state[1]
         return (max if is_maximising else min)(
             self.minimax(state_info, not is_maximising)
-            for state_info in self.possible_new_states(state[0], not is_maximising)
+            for state_info in self.possible_new_states(state[0], is_maximising)
         )
 
     def best_move(self):
