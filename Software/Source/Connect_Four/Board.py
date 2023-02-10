@@ -96,7 +96,3 @@ class Board:
                 if len(connected) >= 4:
                     return True, self.player_number_to_marker[marker]
         return False, None
-
-
-
-
