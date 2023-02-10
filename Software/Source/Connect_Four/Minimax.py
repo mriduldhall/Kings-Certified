@@ -1,5 +1,6 @@
 from Board import Board
 from copy import deepcopy
+import bigtree
 
 
 class Minimax:
@@ -7,6 +8,7 @@ class Minimax:
         self.maximising_marker = maximising_marker
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
+        self.tree = None
 
     def best_move(self, state):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
@@ -86,7 +88,16 @@ if __name__ == '__main__':
         [1, 1, 2, 1, 1, 2, 2],
         [1, 2, 1, 2, 2, 1, 1],
     ]
+    # a.grid = [
+    #     [2, 1, 2, 2, 0, 0, 0],
+    #     [2, 2, 1, 1, 2, 1, 1],
+    #     [1, 2, 1, 2, 1, 2, 2],
+    #     [2, 2, 1, 2, 1, 2, 1],
+    #     [1, 1, 2, 1, 1, 2, 2],
+    #     [1, 2, 1, 2, 2, 1, 1],
+    # ]
     b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"])
     moves, tree = b.best_move_tree(a.grid)
     print(moves)
     print("Best move:", max(moves))
+    bigtree.print_tree(tree, attr_list=["score"])
