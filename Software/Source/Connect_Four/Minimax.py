@@ -20,11 +20,19 @@ class Minimax:
 
     def minimax(self, state, is_maximising):
         if (score := self.evaluate(state)) is not None:
-            return score
-        return (max if is_maximising else min)(
-            self.minimax(possible_state, not is_maximising)
-            for possible_state in self.possible_new_states(deepcopy(state), is_maximising)
-        )
+            node = bigtree.Node(name=str(state), score=str(score))
+            return score, node
+        scores = []
+        nodes = []
+        for possible_state in self.possible_new_states(deepcopy(state), is_maximising):
+            score, child_node = self.minimax_tree(possible_state, not is_maximising)
+            nodes.append(child_node)
+            scores.append(score)
+        node = bigtree.Node(name=str(state), score=str(score), children=nodes)
+        if is_maximising:
+            return max(scores), node
+        else:
+            return min(scores), node
 
     def possible_new_states(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
@@ -58,6 +66,6 @@ if __name__ == '__main__':
         [1, 2, 1, 2, 2, 1, 1],
     ]
     b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"])
-    moves = b.best_move(a.grid)
+    moves, tree = b.best_move_tree(a.grid)
     print(moves)
     print("Best move:", max(moves))

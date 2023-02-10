@@ -53,7 +53,6 @@ class Game:
         p1_first_play = int(p1_first_play)
         current_turn = p1_first_play
 
-
         while not self.board.check_victory()[0] and (len(self.board.get_valid_moves()) > 0):
             self.print_board()
             print("")
