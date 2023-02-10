@@ -22,7 +22,8 @@ class Minimax:
         if (score := self.evaluate(state)) is not None:
             return score
         return (max if is_maximising else min)(
-            self.minimax(possible_state, not is_maximising) for possible_state in self.possible_new_states(deepcopy(state), is_maximising)
+            self.minimax(possible_state, not is_maximising)
+            for possible_state in self.possible_new_states(deepcopy(state), is_maximising)
         )
 
     def possible_new_states(self, state, is_maximising):
