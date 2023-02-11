@@ -1,6 +1,7 @@
 from Board import Board
 from copy import deepcopy
-from bigtree import Node, print_tree
+from bigtree import Node, print_tree, tree_to_dict, dict_to_tree
+from pickle import dump, load
 
 
 class Minimax:
@@ -8,6 +9,7 @@ class Minimax:
         self.maximising_marker = maximising_marker
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
+        self.tree = None
 
     def best_move(self, state):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
@@ -38,7 +40,8 @@ class Minimax:
             scores.append((score, column))
             current_board.grid = deepcopy(state)
         root_node = Node(name=str(state), children=nodes, score=1)
-        return scores, root_node
+        self.tree = root_node
+        return scores
 
     def minimax_tree(self, state, is_maximising):
         if (score := self.evaluate(state)) is not None:
@@ -73,6 +76,16 @@ class Minimax:
             return 0
         return None
 
+    def store_tree(self, file_name="minimax_tree.txt"):
+        tree = tree_to_dict(self.tree, name_key="name", parent_key="parent", attr_dict={"score": "score"})
+        with open(file_name, "wb") as file:
+            dump(tree, file)
+
+    def load_tree(self, file_name="minimax_tree.txt"):
+        with open(file_name, "rb") as file:
+            tree = load(file)
+        self.tree = dict_to_tree(tree)
+
 
 if __name__ == '__main__':
     a = Board(rows=6, columns=7, empty=0, player_1=1, player_2=2, robot='R')
@@ -93,7 +106,7 @@ if __name__ == '__main__':
     #     [1, 2, 1, 2, 2, 1, 1],
     # ]
     b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"])
-    moves, tree = b.best_move_tree(a.grid)
+    moves = b.best_move_tree(a.grid)
     print(moves)
     print("Best move:", max(moves))
-    print_tree(tree, attr_list=["score"])
+    print_tree(b.tree, attr_list=["score"])
