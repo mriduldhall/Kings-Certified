@@ -1,6 +1,6 @@
 from Board import Board
 from copy import deepcopy
-import bigtree
+from bigtree import Node, print_tree
 
 
 class Minimax:
@@ -8,7 +8,6 @@ class Minimax:
         self.maximising_marker = maximising_marker
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
-        self.tree = None
 
     def best_move(self, state):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
@@ -38,12 +37,12 @@ class Minimax:
             nodes.append(child_node)
             scores.append((score, column))
             current_board.grid = deepcopy(state)
-        root_node = bigtree.Node(name=str(state), children=nodes, score=1)
+        root_node = Node(name=str(state), children=nodes, score=1)
         return scores, root_node
 
     def minimax_tree(self, state, is_maximising):
         if (score := self.evaluate(state)) is not None:
-            node = bigtree.Node(name=str(state), score=str(score))
+            node = Node(name=str(state), score=str(score))
             return score, node
         scores = []
         nodes = []
@@ -51,11 +50,8 @@ class Minimax:
             score, child_node = self.minimax_tree(possible_state, not is_maximising)
             nodes.append(child_node)
             scores.append(score)
-        node = bigtree.Node(name=str(state), score=str(score), children=nodes)
-        if is_maximising:
-            return max(scores), node
-        else:
-            return min(scores), node
+        node = Node(name=str(state), score=str(score), children=nodes)
+        return (max if is_maximising else min)(scores), node
 
     def possible_new_states(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
@@ -100,4 +96,4 @@ if __name__ == '__main__':
     moves, tree = b.best_move_tree(a.grid)
     print(moves)
     print("Best move:", max(moves))
-    bigtree.print_tree(tree, attr_list=["score"])
+    print_tree(tree, attr_list=["score"])
