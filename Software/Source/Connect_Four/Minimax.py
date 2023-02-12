@@ -53,8 +53,12 @@ class Minimax:
             score, child_node = self.minimax_tree(possible_state, not is_maximising)
             nodes.append(child_node)
             scores.append(score)
-        node = Node(name=str(state), score=str(score), children=nodes)
-        return (max if is_maximising else min)(scores), node
+        if is_maximising:
+            node = Node(name=str(state), score=str(max(scores)), children=nodes)
+            return max(scores), node
+        else:
+            node = Node(name=str(state), score=str(min(scores)), children=nodes)
+            return max(scores), node
 
     def possible_new_states(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
@@ -89,22 +93,22 @@ class Minimax:
 
 if __name__ == '__main__':
     a = Board(rows=6, columns=7, empty=0, player_1=1, player_2=2, robot='R')
-    a.grid = [
-        [0, 0, 0, 0, 0, 0, 0],
-        [2, 0, 0, 1, 2, 1, 1],
-        [1, 2, 1, 2, 1, 2, 2],
-        [2, 2, 1, 2, 1, 2, 1],
-        [1, 1, 2, 1, 1, 2, 2],
-        [1, 2, 1, 2, 2, 1, 1],
-    ]
     # a.grid = [
-    #     [2, 1, 2, 2, 0, 0, 0],
-    #     [2, 2, 1, 1, 2, 1, 1],
+    #     [0, 0, 0, 0, 0, 0, 0],
+    #     [2, 0, 0, 1, 2, 1, 1],
     #     [1, 2, 1, 2, 1, 2, 2],
     #     [2, 2, 1, 2, 1, 2, 1],
     #     [1, 1, 2, 1, 1, 2, 2],
     #     [1, 2, 1, 2, 2, 1, 1],
     # ]
+    a.grid = [
+        [2, 1, 2, 2, 0, 0, 0],
+        [2, 2, 1, 1, 2, 1, 1],
+        [1, 2, 1, 2, 1, 2, 2],
+        [2, 2, 1, 2, 1, 2, 1],
+        [1, 1, 2, 1, 1, 2, 2],
+        [1, 2, 1, 2, 2, 1, 1],
+    ]
     b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"])
     moves = b.best_move_tree(a.grid)
     print(moves)
