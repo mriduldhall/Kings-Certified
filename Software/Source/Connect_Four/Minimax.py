@@ -60,6 +60,7 @@ class Minimax:
             node = Node(name=str(state), score=str(min(scores)), children=nodes)
             return max(scores), node
 
+
     def possible_new_states(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
         player_marker = self.maximising_marker if is_maximising else self.minimising_marker
