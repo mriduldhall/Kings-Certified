@@ -58,8 +58,7 @@ class Minimax:
             return max(scores), node
         else:
             node = Node(name=str(state), score=str(min(scores)), children=nodes)
-            return max(scores), node
-
+            return min(scores), node
 
     def possible_new_states(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
