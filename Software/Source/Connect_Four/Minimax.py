@@ -2,6 +2,7 @@ from Board import Board
 from copy import deepcopy
 from bigtree import Node, print_tree, tree_to_dict, dict_to_tree
 from pickle import dump, load
+from operator import attrgetter
 
 
 class Minimax:
@@ -10,6 +11,7 @@ class Minimax:
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
         self.tree = None
+        self.current_node = None
 
     def best_move(self, state):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
@@ -49,7 +51,7 @@ class Minimax:
             return score, node
         scores = []
         nodes = []
-        for possible_state, column in self.possible_new_states(deepcopy(state), is_maximising):
+        for possible_state, column in self.possible_new_states(deepcopy(state), is_maximising): #tupple
             score, child_node = self.minimax_tree(possible_state, not is_maximising, previous_moves + str(column))
             nodes.append(child_node)
             scores.append(score)
@@ -91,6 +93,16 @@ class Minimax:
         with open(file_name, "rb") as file:
             tree = load(file)
         self.tree = dict_to_tree(tree)
+        self.current_node = self.tree
+
+    def next_best_move(self, is_maximising):
+        child_nodes = self.current_node.children
+        best_move = max(child_nodes, key=attrgetter('score')) if is_maximising else min(child_nodes, key=attrgetter('score'))
+        return int(best_move.name[-1])
+    def follow_move(self, column):
+        for node in self.current_node.children:
+            if column == int(node.name[-1]):
+                self.current_node = node
 
 
 if __name__ == '__main__':
