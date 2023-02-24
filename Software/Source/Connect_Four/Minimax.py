@@ -99,6 +99,7 @@ class Minimax:
         child_nodes = self.current_node.children
         best_move = max(child_nodes, key=attrgetter('score')) if is_maximising else min(child_nodes, key=attrgetter('score'))
         return int(best_move.name[-1])
+
     def follow_move(self, column):
         for node in self.current_node.children:
             if column == int(node.name[-1]):
