@@ -51,7 +51,7 @@ class Minimax:
             return score, node
         scores = []
         nodes = []
-        for possible_state, column in self.possible_new_states(deepcopy(state), is_maximising): #tupple
+        for possible_state, column in self.possible_new_states(deepcopy(state), is_maximising):
             score, child_node = self.minimax_tree(possible_state, not is_maximising, previous_moves + str(column))
             nodes.append(child_node)
             scores.append(score)

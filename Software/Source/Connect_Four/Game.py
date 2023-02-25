@@ -8,14 +8,6 @@ class Game:
         self.board = Board(rows, columns, empty, player_1, player_2, 'R')
         self.minimax = Minimax(maximising_marker, minimising_marker, [rows, columns, empty, player_1, player_2, "R"])
         self.minimax.load_tree()
-        self.board.grid = [
-            [0, 0, 0, 0, 0, 0, 0],
-            [1, 0, 0, 'R', 1, 'R', 'R'],
-            ['R', 1, 'R', 1, 'R', 1, 1],
-            [1, 1, 'R', 1, 'R', 1, 'R'],
-            ['R', 'R', 1, 'R', 'R', 1, 1],
-            ['R', 1, 'R', 1, 1, 'R', 'R'],
-        ]
 
     def print_board(self):
         print('   |   '.join([str(column) for column in [col for col in range(self.board.number_of_columns)]]))
@@ -28,16 +20,15 @@ class Game:
         """
         max_column = self.board.number_of_columns - 1
         column = (input(f"Enter column (0 - {max_column}): "))
-        self.minimax.follow_move(column)
         marker = self.board.player_number_to_marker[player_number]
         while not Validator(column).type_validation(int) or (int(column) not in self.board.get_valid_moves()):
             print("Invalid move.")
             column = input(f"Enter column (0 - {max_column}): ")
         self.board.make_move(int(column), marker)
+        self.minimax.follow_move(int(column))
 
     def make_robot_move(self):
         column = self.minimax.next_best_move(True)
-        print(column)
         marker = self.board.player_number_to_marker["R"]
         self.board.make_move(column, marker)
         self.minimax.follow_move(column)
@@ -100,4 +91,15 @@ class Game:
 
 
 if __name__ == '__main__':
-    Game().play_game()
+    game = Game()
+    while True:
+        game.board.grid = [
+            [0, 0, 0, 0, 0, 0, 0],
+            [1, 0, 0, 'R', 1, 'R', 'R'],
+            ['R', 1, 'R', 1, 'R', 1, 1],
+            [1, 1, 'R', 1, 'R', 1, 'R'],
+            ['R', 'R', 1, 'R', 'R', 1, 1],
+            ['R', 1, 'R', 1, 1, 'R', 'R'],
+        ]
+        game.play_game()
+        game.minimax.current_node = game.minimax.tree
