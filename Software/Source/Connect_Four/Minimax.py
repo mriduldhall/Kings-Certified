@@ -3,6 +3,7 @@ from copy import deepcopy
 from bigtree import Node, print_tree, tree_to_dict, dict_to_tree
 from pickle import dump, load
 from operator import attrgetter
+from random import choice
 
 
 class Minimax:
@@ -97,8 +98,12 @@ class Minimax:
 
     def next_best_move(self, is_maximising):
         child_nodes = self.current_node.children
-        best_move = max(child_nodes, key=attrgetter('score')) if is_maximising else min(child_nodes, key=attrgetter('score'))
-        return int(best_move.name[-1])
+        best_moves = []
+        max_score = (max(child_nodes, key=attrgetter('score'))).score if is_maximising else (min(child_nodes, key=attrgetter('score'))).score
+        for node in child_nodes:
+            if node.score == max_score:
+                best_moves.append(node)
+        return int(choice(best_moves).name[-1])
 
     def follow_move(self, column):
         for node in self.current_node.children:
@@ -124,9 +129,19 @@ if __name__ == '__main__':
     #     [1, 1, 2, 1, 1, 2, 2],
     #     [1, 2, 1, 2, 2, 1, 1],
     # ]
+
+    # a.grid = [
+    #     [0, 0, 0, 0, 0, 0, 0],
+    #     [2, 2, 1, 1, 2, 1, 1],
+    #     [1, 2, 1, 2, 1, 2, 1],
+    #     [2, 2, 1, 2, 1, 2, 1],
+    #     [1, 1, 2, 1, 1, 2, 2],
+    #     [1, 2, 1, 2, 2, 1, 1],
+    # ]
+
     b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"])
     moves = b.best_move_tree(a.grid)
     print(moves)
     print("Best move:", max(moves))
-    b.store_tree()
+    #b.store_tree()
     print_tree(b.tree, attr_list=["score"])
