@@ -104,11 +104,11 @@ class Minimax:
         for node in child_nodes:
             if node.score == max_score:
                 best_moves.append(node)
-        return int(choice(best_moves).name[-1])
+        return int(choice(best_moves).name)
 
     def follow_move(self, column):
         for node in self.current_node.children:
-            if column == int(node.name[-1]):
+            if int(node.name) == column:
                 self.current_node = node
 
 
