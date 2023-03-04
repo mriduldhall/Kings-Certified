@@ -47,21 +47,21 @@ class Minimax:
         self.current_node = self.tree
         return scores
 
-    def minimax_tree(self, state, is_maximising, previous_moves):
+    def minimax_tree(self, state, is_maximising, previous_move):
         if (score := self.evaluate(state)) is not None:
-            node = Node(name=str(previous_moves), score=str(score))
+            node = Node(name=str(previous_move), score=str(score))
             return score, node
         scores = []
         nodes = []
         for possible_state, column in self.possible_new_states(deepcopy(state), is_maximising):
-            score, child_node = self.minimax_tree(possible_state, not is_maximising, previous_moves + str(column))
+            score, child_node = self.minimax_tree(possible_state, not is_maximising, column)
             nodes.append(child_node)
             scores.append(score)
         if is_maximising:
-            node = Node(name=str(previous_moves), score=str(max(scores)), children=nodes)
+            node = Node(name=str(previous_move), score=str(max(scores)), children=nodes)
             return max(scores), node
         else:
-            node = Node(name=str(previous_moves), score=str(min(scores)), children=nodes)
+            node = Node(name=str(previous_move), score=str(min(scores)), children=nodes)
             return min(scores), node
 
     def possible_new_states(self, state, is_maximising):
