@@ -44,6 +44,7 @@ class Minimax:
             current_board.grid = deepcopy(state)
         root_node = Node(name=str(" "), children=nodes, score=1)
         self.tree = root_node
+        self.current_node = self.tree
         return scores
 
     def minimax_tree(self, state, is_maximising, previous_moves):
@@ -131,7 +132,7 @@ if __name__ == '__main__':
     # ]
 
     # a.grid = [
-    #     [0, 0, 0, 0, 0, 0, 0],
+    #     [2, 1, 0, 2, 2, 2, 0],
     #     [2, 2, 1, 1, 2, 1, 1],
     #     [1, 2, 1, 2, 1, 2, 1],
     #     [2, 2, 1, 2, 1, 2, 1],
@@ -142,6 +143,6 @@ if __name__ == '__main__':
     b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"])
     moves = b.best_move_tree(a.grid)
     print(moves)
-    print("Best move:", max(moves))
-    #b.store_tree()
+    print("Best move:", b.next_best_move(True))
+    # b.store_tree()
     print_tree(b.tree, attr_list=["score"])
