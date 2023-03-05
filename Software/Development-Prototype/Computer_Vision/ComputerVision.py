@@ -4,8 +4,13 @@ import numpy as np
 
 token_colours = {"Red": (10, 10, 230), "Yellow": (10, 230, 230), "Blue": (230, 10, 10)}
 
+# img = cv.imread("miku.png")
+# cv.imshow("Miku", img)
+
 capture = cv.VideoCapture(0)
 
+
+# capture = cv.VideoCapture("Domino's App Feat Hatsune Miku (Original).mp4")
 
 def rescale_frame(frame, scale=0.2):
     width = int(frame.shape[1] * scale)
@@ -47,11 +52,16 @@ def average_colour(filtered_img, radius, circle_centre):
     return mean_colour
 
 
+def height_width_calc(token_list):
+    pass
+
+
 def grid_size(token_list):
     rightmost_circle_centre = token_list[0][0]
     leftmost_circle_centre = token_list[0][0]
 
     for i in range(len(token_list)):
+        # rightmost
         if token_list[i][0][0] > rightmost_circle_centre[0]:
             rightmost_circle_centre = token_list[i][0]
         elif token_list[i][0][0] < leftmost_circle_centre[0]:
@@ -137,6 +147,37 @@ def print_grid(grid):
         print()
 
 
+def convert_to_game_grid(colour_grid):
+    GRID_SIZE = (7, 6)
+
+    empty_marker = 0
+    player1_marker = 1
+    player2_marker = 2
+    robot_marker = "R"
+
+    player1_colour = "Red"
+    player2_colour = "Yellow"
+    robot_colour = player2_colour
+
+    game_grid = [[None for columns in range(GRID_SIZE[0])] for rows in range(GRID_SIZE[1])]
+
+    for columns in range(len(game_grid)):
+        for rows in range(len(game_grid[0])):
+            if colour_grid[columns][rows][1] == player1_colour:
+                game_grid[columns][rows] = player1_marker
+
+            elif colour_grid[columns][rows][1] == player2_colour:
+                game_grid[columns][rows] = player2_marker
+
+            elif colour_grid[columns][rows][1] == robot_colour:
+                game_grid[columns][rows] = robot_marker
+
+            else:
+                game_grid[columns][rows] = empty_marker
+
+    return game_grid
+
+
 count = 1
 while count == 1:
     # isTrue, frame = capture.read()
@@ -144,6 +185,7 @@ while count == 1:
     # frame = cv.imread("Maybe the thing\Test_Images\circles.png")
     frame = cv.imread("picture4.jpg")
     # frame = rescale_frame(frame, 0.4)
+
     bi_filter = cv.bilateralFilter(frame, 15, 150, 150)
     blank = np.zeros((frame.shape[1], frame.shape[0]), dtype='uint8')
 
@@ -235,8 +277,11 @@ while count == 1:
     sorted_tokens = sort_tokens(rounded_tokens)
 
     print_grid(sorted_tokens)
-
+    print(convert_to_game_grid(sorted_tokens))
     sleep(0.2)
     if cv.waitKey(0) & 0xFF == ord("d"):
         break
     count = 0
+
+# capture.release()
+# cv.destroyAllWindows()
