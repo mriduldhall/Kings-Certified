@@ -29,7 +29,7 @@ class ComputerVision:
 
     def refresh_attributes(self, capture):
         # self.isTrue, self.frame = capture.read()
-        self.frame = cv.imread('Software\Development-Prototype\Computer_Vision\Test_Images\picture2.jpg')
+        self.frame = cv.imread('Test_Images/picture2.jpg')
         self.blank = np.zeros((self.frame.shape[1], self.frame.shape[0]), dtype='uint8')
         self.bi_filter = cv.bilateralFilter(self.frame, 15, 150, 150)
         self.canny = cv.Canny(self.bi_filter, 125, 175)
@@ -50,10 +50,10 @@ class ComputerVision:
 
         grid_width_pixels = rightmost_circle_centre[0] - leftmost_circle_centre[0]
 
-        print(f"Rightmost: {rightmost_circle_centre}")
-        print(f"leftmost: {leftmost_circle_centre}")
-        print(f"Grid width: {grid_width_pixels}")
-        print()
+        # print(f"Rightmost: {rightmost_circle_centre}")
+        # print(f"leftmost: {leftmost_circle_centre}")
+        # print(f"Grid width: {grid_width_pixels}")
+        # print()
 
         highest_circle_centre = self.token_list[0][0]
         lowest_circle_centre = self.token_list[0][0]
@@ -70,10 +70,10 @@ class ComputerVision:
         grid_size_pixels = (grid_width_pixels, grid_height_pixels)
         top_left_approx = (leftmost_circle_centre[0], highest_circle_centre[1])
 
-        print(f"Highest: {highest_circle_centre}")
-        print(f"Lowest: {leftmost_circle_centre}")
-        print(f"Grid height: {grid_height_pixels}")
-        print(f"Grid size {grid_size_pixels}")
+        # print(f"Highest: {highest_circle_centre}")
+        # print(f"Lowest: {leftmost_circle_centre}")
+        # print(f"Grid height: {grid_height_pixels}")
+        # print(f"Grid size {grid_size_pixels}")
 
         return grid_size_pixels, top_left_approx
 
@@ -246,7 +246,7 @@ class ComputerVision:
         x2, y2 = x1 - draw_distance, y1
 
         cv.line(self.bi_filter, (x1, y1), (x2, y2), (0, 0, 255), thickness=2)
-        cv.imshow("Filtered Video", self.bi_filter)
+        cv.imshow("Labeled, Filtered Feed", self.bi_filter)
 
         # self.print_grid(self.token_list)
 
@@ -261,6 +261,7 @@ class ComputerVision:
         # self.print_grid(sorted_tokens)
 
         converted_grid = self.convert_to_game_grid(sorted_tokens)
+        # print(converted_grid)
 
         return converted_grid
 
