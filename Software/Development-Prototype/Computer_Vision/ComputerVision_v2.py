@@ -3,10 +3,6 @@ import numpy as np
 
 
 def red(circle_img):
-    """
-    return True if the circle is mostly RED else False
-    """
-    # cv2.imshow('cir1', circle_img)
     circle_img = cv2.cvtColor(circle_img, cv2.COLOR_BGR2HSV)
 
     # lower boundary RED color range values; Hue (0 - 10)
@@ -22,12 +18,8 @@ def red(circle_img):
 
     full_mask = lower_mask + upper_mask
     result = cv2.bitwise_and(circle_img, circle_img, mask=full_mask)
-    # cv2.imshow('ranfom', result)
     blacks = np.count_nonzero(result[::] == np.array([0, 0, 0]))
     total = np.prod(result.shape)
-
-    # print(blacks, total)
-    # print(circle_img.shape, result.shape)
 
     # black is less than 60%
     if blacks / total < 0.6:
@@ -36,25 +28,17 @@ def red(circle_img):
 
 
 def yellow(circle_img):
-    """
-    return True if the circle is mostly YELLOW else False
-    """
-    # cv2.imshow('cir1', circle_img)
     circle_img = cv2.cvtColor(circle_img, cv2.COLOR_BGR2HSV)
 
-    # lower boundary RED color range values; Hue (0 - 10)
+    # lower boundary Yellow color range values; Hue (10 - 87)
     lower = np.array([10, 140, 129])
     upper = np.array([87, 255, 255])
 
     mask = cv2.inRange(circle_img, lower, upper)
 
     result = cv2.bitwise_and(circle_img, circle_img, mask=mask)
-    # cv2.imshow('ranfom', result)
     blacks = np.count_nonzero(result[::] == np.array([0, 0, 0]))
     total = np.prod(result.shape)
-
-    # print(blacks, total)
-    # print(circle_img.shape, result.shape)
 
     # black is less than 60%
     if blacks / total < 0.6:
@@ -64,7 +48,9 @@ def yellow(circle_img):
 
 def get_most_common_color(img, circle):
     """
-    Takes an image and a circle and returns the most common color in the area where the circle is drawn
+    :param img: The original Image
+    :param circle: The coordinates of the circles in format (x, y, r).
+    :return: R for red, Y for yellow and X for other
     """
     x, y, r = circle
     circle_img = img[y - r:y + r, x - r:x + r]
@@ -77,9 +63,9 @@ def get_most_common_color(img, circle):
 
 def get_grid(img, coordinates: np.ndarray):
     """
-    img: The original Image
-    coordinates: The coordinates of the circles in format (x, y, r).
-    return: grid in the intended format
+    :param img: The original Image
+    :param coordinates: The coordinates of the circles in format (x, y, r).
+    :return: Grid in the format used by BOARD
     """
     n_of_rows, n_of_columns = 6, 7
     # Sort by y-coordiantes
@@ -102,15 +88,10 @@ def get_grid(img, coordinates: np.ndarray):
                 single_row.append(0)
         grid.append(single_row)
 
-    # print(y_sorted, rows)
-
     return grid
 
 
 def get_coordinates(img):
-    # Read the input image -- It can be video later.
-    # img = cv2.imread(img_address)
-
     # Convert the image to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -126,7 +107,6 @@ def get_coordinates(img):
     # Detect red and blue circles using HoughCircles image6
     # circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 1.5, 20, param1=50, param2=30, minRadius=35, maxRadius=40)
 
-    # Draw the detected circles
     if circles is not None:
         circles = np.round(circles[0, :]).astype("int")
         return circles
@@ -138,7 +118,6 @@ if __name__ == '__main__':
     img = cv2.imread('Test_Images/picture4.jpg')
 
     coordinates = get_coordinates(img.copy())
-    # print(coordinates.shape)
     if coordinates is None:
         print('Error Reading the grid!')
     elif coordinates.shape != (42, 3):
@@ -148,7 +127,6 @@ if __name__ == '__main__':
         for row in grid:
             print(row)
 
-    # Display the image with the detected circles
-    cv2.imshow('Original Imange', img)
+    cv2.imshow('Original Image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
