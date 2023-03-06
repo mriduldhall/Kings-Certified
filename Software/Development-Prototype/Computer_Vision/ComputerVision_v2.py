@@ -2,131 +2,123 @@ import cv2
 import numpy as np
 
 
-def red(circle_img):
-    circle_img = cv2.cvtColor(circle_img, cv2.COLOR_BGR2HSV)
+class Connect4Detector:
+    def __init__(self, img_path, radius=40, n_of_rows=6, n_of_column=7):
+        self.img = cv2.imread(img_path)
+        self.n_of_rows = n_of_rows
+        self.n_of_columns = n_of_column
+        self.radius = radius
+        self.players = {
+            'R': 1,
+            'Y': 2,
+            'X': 0
+        }
+        # Colours Range in Hue
+        # RED
+        self.lower_red1 = np.array([0, 100, 20])
+        self.upper_red1 = np.array([10, 255, 255])
+        self.lower_red2 = np.array([160, 100, 20])
+        self.upper_red2 = np.array([179, 255, 255])
+        # YELLOW
+        self.lower_yellow = np.array([10, 140, 129])
+        self.upper_yellow = np.array([87, 255, 255])
 
-    # lower boundary RED color range values; Hue (0 - 10)
-    lower1 = np.array([0, 100, 20])
-    upper1 = np.array([10, 255, 255])
+    def _is_red(self, circle_img):
+        """
+        Returns True if the circle is mostly RED else False.
+        """
+        circle_img = cv2.cvtColor(circle_img, cv2.COLOR_BGR2HSV)
+        lower_mask = cv2.inRange(circle_img, self.lower_red1, self.upper_red1)
+        upper_mask = cv2.inRange(circle_img, self.lower_red2, self.upper_red2)
+        full_mask = lower_mask + upper_mask
+        result = cv2.bitwise_and(circle_img, circle_img, mask=full_mask)
+        blacks = np.count_nonzero(result[::] == np.array([0, 0, 0]))
+        total = np.prod(result.shape)
+        return blacks / total < 0.6
 
-    # upper boundary RED color range values; Hue (160 - 180)
-    lower2 = np.array([160, 100, 20])
-    upper2 = np.array([179, 255, 255])
+    def _is_yellow(self, circle_img):
+        """
+        Returns True if the circle is mostly YELLOW else False.
+        """
+        circle_img = cv2.cvtColor(circle_img, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(circle_img, self.lower_yellow, self.upper_yellow)
+        result = cv2.bitwise_and(circle_img, circle_img, mask=mask)
+        blacks = np.count_nonzero(result[::] == np.array([0, 0, 0]))
+        total = np.prod(result.shape)
+        return blacks / total < 0.6
 
-    lower_mask = cv2.inRange(circle_img, lower1, upper1)
-    upper_mask = cv2.inRange(circle_img, lower2, upper2)
+    def _get_most_common_color(self, circle):
+        """
+        Takes an image and a circle and returns the most common color in the area where the circle is drawn.
+        """
+        x, y, r = circle
+        circle_img = self.img[y - r: y + r, x - r: x + r]
+        if self._is_red(circle_img):
+            return "R"
+        elif self._is_yellow(circle_img):
+            return "Y"
+        return "X"
 
-    full_mask = lower_mask + upper_mask
-    result = cv2.bitwise_and(circle_img, circle_img, mask=full_mask)
-    blacks = np.count_nonzero(result[::] == np.array([0, 0, 0]))
-    total = np.prod(result.shape)
+    def _get_coordinates(self):
+        """
+        Detects circles in the given image and returns their coordinates.
+        """
+        gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
+        circles = cv2.HoughCircles(
+            blur,
+            cv2.HOUGH_GRADIENT,
+            1.5,
+            20,
+            param1=50,
+            param2=30,
+            minRadius=self.radius,
+            maxRadius=self.radius + 5,
+        )
+        if circles is not None:
+            return np.round(circles[0, :]).astype("int")
+        return None
 
-    # black is less than 60%
-    if blacks / total < 0.6:
-        return True
-    return False
+    def detect(self):
+        """
+        Given an image path, detects the Connect 4 game and returns its state.
+        """
+        coordinates = self._get_coordinates()
+        if coordinates is None:
+            print("No circles detected.")
+            return None
+        y_sorted = coordinates[coordinates[:, 1].argsort()]
+        rows = y_sorted.reshape((self.n_of_rows, self.n_of_columns, 3))
+        rows = rows[:, rows[:, :, 0].argsort()][np.diag_indices(self.n_of_rows)]
 
+        grid = []
+        for row in range(self.n_of_rows):
+            single_row = []
+            for column in range(self.n_of_columns):
+                player = self._get_most_common_color(rows[row, column])
+                single_row.append(self.players[player])
+            grid.append(single_row)
 
-def yellow(circle_img):
-    circle_img = cv2.cvtColor(circle_img, cv2.COLOR_BGR2HSV)
-
-    # lower boundary Yellow color range values; Hue (10 - 87)
-    lower = np.array([10, 140, 129])
-    upper = np.array([87, 255, 255])
-
-    mask = cv2.inRange(circle_img, lower, upper)
-
-    result = cv2.bitwise_and(circle_img, circle_img, mask=mask)
-    blacks = np.count_nonzero(result[::] == np.array([0, 0, 0]))
-    total = np.prod(result.shape)
-
-    # black is less than 60%
-    if blacks / total < 0.6:
-        return True
-    return False
-
-
-def get_most_common_color(img, circle):
-    """
-    :param img: The original Image
-    :param circle: The coordinates of the circles in format (x, y, r).
-    :return: R for red, Y for yellow and X for other
-    """
-    x, y, r = circle
-    circle_img = img[y - r:y + r, x - r:x + r]
-    if red(circle_img):
-        return 'R'
-    elif yellow(circle_img):
-        return 'Y'
-    return 'X'
-
-
-def get_grid(img, coordinates: np.ndarray):
-    """
-    :param img: The original Image
-    :param coordinates: The coordinates of the circles in format (x, y, r).
-    :return: Grid in the format used by BOARD
-    """
-    n_of_rows, n_of_columns = 6, 7
-    # Sort by y-coordiantes
-    y_sorted = coordinates[coordinates[:, 1].argsort()]
-    # Divide into matrix for each row
-    rows = y_sorted.reshape((n_of_rows, n_of_columns, 3))
-    # Sort each row by x-coordinate
-    rows = rows[:, rows[:, :, 0].argsort()][np.diag_indices(n_of_rows)]
-
-    grid = []
-    for row in range(n_of_rows):
-        single_row = []
-        for column in range(n_of_columns):
-            player = get_most_common_color(img, rows[row, column])
-            if player == 'R':
-                single_row.append(1)
-            elif player == 'Y':
-                single_row.append(2)
-            else:
-                single_row.append(0)
-        grid.append(single_row)
-
-    return grid
-
-
-def get_coordinates(img):
-    # Convert the image to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # To Reduce noise
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-
-    # Detect red and blue circles using HoughCircles image2
-    # circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 1.5, 20, param1=50, param2=30, minRadius=15, maxRadius=20)
-
-    # Detect red and blue circles using HoughCircles image4
-    circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 1.5, 20, param1=50, param2=30, minRadius=40, maxRadius=45)
-
-    # Detect red and blue circles using HoughCircles image6
-    # circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, 1.5, 20, param1=50, param2=30, minRadius=35, maxRadius=40)
-
-    if circles is not None:
-        circles = np.round(circles[0, :]).astype("int")
-        return circles
-    return None
+        return grid
 
 
 if __name__ == '__main__':
-    # Read the input image -- It can be video later.
-    img = cv2.imread('Test_Images/picture4.jpg')
-
-    coordinates = get_coordinates(img.copy())
-    if coordinates is None:
-        print('Error Reading the grid!')
-    elif coordinates.shape != (42, 3):
-        print('Not All the Grid Read Successfully!!')
-    else:
-        grid = get_grid(img, coordinates)
-        for row in grid:
-            print(row)
-
-    cv2.imshow('Original Image', img)
+    img_path = 'Images/Test_Images/picture4.jpg'
+    img4 = Connect4Detector(img_path)
+    grid = img4.detect()
+    for row in grid:
+        print(row)
+    # To show the image for testing purposes!
+    cv2.imshow(img_path, cv2.imread(img_path))
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+    # img4.img = cv2.imread('Images/Test_Images/picture2.jpg')
+    # img4.radius = 15
+    # grid = img4.detect()
+    # for row in grid:
+    #     print(row)
+    # cv2.imshow('Images/Test_Images/picture2.jpg', cv2.imread('Images/Test_Images/picture2.jpg'))
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
