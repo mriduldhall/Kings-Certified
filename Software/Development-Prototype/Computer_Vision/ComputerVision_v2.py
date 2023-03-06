@@ -87,6 +87,9 @@ class Connect4Detector:
         if coordinates is None:
             print("No circles detected.")
             return None
+        elif coordinates.shape != (42, 3):
+            print('Not All the Grid Read Successfully!!')
+            return None
         y_sorted = coordinates[coordinates[:, 1].argsort()]
         rows = y_sorted.reshape((self.n_of_rows, self.n_of_columns, 3))
         rows = rows[:, rows[:, :, 0].argsort()][np.diag_indices(self.n_of_rows)]
