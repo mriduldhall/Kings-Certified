@@ -103,7 +103,7 @@ class Connect4Detector:
 
 
 if __name__ == '__main__':
-    img_path = 'Images/Test_Images/picture4.jpg'
+    img_path = 'Test_Images/picture4.jpg'
     img4 = Connect4Detector(img_path)
     grid = img4.detect()
     for row in grid:
