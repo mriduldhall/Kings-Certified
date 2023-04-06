@@ -1,4 +1,5 @@
 from Board import Board
+from TreeStorageFunctions import TreeStorageFunction
 from copy import deepcopy
 from bigtree import Node, print_tree, tree_to_dict, dict_to_tree
 from pickle import dump, load
@@ -13,6 +14,8 @@ class Minimax:
         self.game_setup_arguments = game_setup_arguments
         self.tree = None
         self.current_node = None
+        self.current_depth = None
+        self.storage_function = TreeStorageFunction()
 
     def best_move(self, state):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
@@ -33,18 +36,17 @@ class Minimax:
         )
 
     def best_move_tree(self, state):
+        self.storage_function.max_depth = sum([row.count(self.game_setup_arguments[2]) for row in state])
+        self.storage_function.initialise_files()
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
         scores = []
-        nodes = []
         for column in current_board.get_valid_moves():
             current_board.make_move(column, self.maximising_marker)
-            score, child_node = self.minimax_tree(current_board.grid, False, str(column))
-            nodes.append(child_node)
+            score, line_number = self.minimax_tree_divide(current_board.grid, False, str(column), str(column), 1)
             scores.append((score, column))
             current_board.grid = deepcopy(state)
-        root_node = Node(name=str(" "), children=nodes, score=1)
-        self.tree = root_node
         self.current_node = self.tree
+        self.storage_function.close_files()
         return scores
 
     def minimax_tree(self, state, is_maximising, previous_move):
@@ -63,6 +65,25 @@ class Minimax:
         else:
             node = Node(name=str(previous_move), score=str(min(scores)), children=nodes)
             return min(scores), node
+
+    def minimax_tree_divide(self, state, is_maximising, previous_move, previous_moves, depth):
+        if (score := self.evaluate(state)) is not None:
+            line_number = self.storage_function.write_node(str(previous_move), str(score), depth)
+            return score, line_number
+        scores = []
+        lines_used = 0
+        line_number = 1
+        for possible_state, column in self.possible_new_states(deepcopy(state), is_maximising):
+            score, line_number = self.minimax_tree_divide(possible_state, not is_maximising, column, previous_moves + str(column), depth + 1)
+            scores.append(score)
+            lines_used += 1
+        line_number = str(int(line_number) - lines_used + 1)
+        if is_maximising:
+            line_number = self.storage_function.write_node(str(previous_move), str(max(scores)), depth, line_number)
+            return max(scores), line_number
+        else:
+            line_number = self.storage_function.write_node(str(previous_move), str(min(scores)), depth, line_number)
+            return min(scores), line_number
 
     def possible_new_states(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, deepcopy(state))
@@ -130,7 +151,6 @@ if __name__ == '__main__':
     #     [1, 1, 2, 1, 1, 2, 2],
     #     [1, 2, 1, 2, 2, 1, 1],
     # ]
-
     # a.grid = [
     #     [2, 1, 0, 2, 2, 2, 0],
     #     [2, 2, 1, 1, 2, 1, 1],
@@ -143,6 +163,6 @@ if __name__ == '__main__':
     b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"])
     moves = b.best_move_tree(a.grid)
     print(moves)
-    print("Best move:", b.next_best_move(True))
+    # print("Best move:", b.next_best_move(True))
     # b.store_tree()
-    print_tree(b.tree, attr_list=["score"])
+    # print_tree(b.tree, attr_list=["score"])
