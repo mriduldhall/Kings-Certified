@@ -7,7 +7,7 @@ class Game:
     def __init__(self, rows=6, columns=7, empty=0, player_1=1, player_2=2, maximising_marker='R', minimising_marker=1):
         self.board = Board(rows, columns, empty, player_1, player_2, 'R')
         self.minimax = Minimax(maximising_marker, minimising_marker, [rows, columns, empty, player_1, player_2, "R"])
-        self.minimax.load_tree()
+        # self.minimax.load_tree()
 
     def print_board(self):
         print('   |   '.join([str(column) for column in [col for col in range(self.board.number_of_columns)]]))
@@ -93,13 +93,13 @@ class Game:
 if __name__ == '__main__':
     game = Game()
     while True:
-        game.board.grid = [
-            [0, 0, 0, 0, 0, 0, 0],
-            [1, 0, 0, 'R', 1, 'R', 'R'],
-            ['R', 1, 'R', 1, 'R', 1, 1],
-            [1, 1, 'R', 1, 'R', 1, 'R'],
-            ['R', 'R', 1, 'R', 'R', 1, 1],
-            ['R', 1, 'R', 1, 1, 'R', 'R'],
-        ]
+        # game.board.grid = [
+        #     [0, 0, 0, 0, 0, 0, 0],
+        #     [1, 0, 0, 'R', 1, 'R', 'R'],
+        #     ['R', 1, 'R', 1, 'R', 1, 1],
+        #     [1, 1, 'R', 1, 'R', 1, 'R'],
+        #     ['R', 'R', 1, 'R', 'R', 1, 1],
+        #     ['R', 1, 'R', 1, 1, 'R', 'R'],
+        # ]
         game.play_game()
-        game.minimax.current_node = game.minimax.tree
+        # game.minimax.current_node = game.minimax.tree
