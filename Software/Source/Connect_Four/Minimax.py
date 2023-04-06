@@ -1,6 +1,5 @@
 from Board import Board
 from TreeStorageFunctions import TreeStorageFunction
-from copy import deepcopy
 
 
 class Minimax:
@@ -13,13 +12,13 @@ class Minimax:
     def best_move(self, state):
         self.storage_function.max_depth = sum([row.count(self.game_setup_arguments[2]) for row in state])
         self.storage_function.initialise_files()
-        current_board = Board(*self.game_setup_arguments, deepcopy(state))
+        current_board = Board(*self.game_setup_arguments, self.deepcopy(state))
         scores = []
         for column in current_board.get_valid_moves():
             current_board.make_move(column, self.maximising_marker)
             score, line_number = self.minimax(current_board.grid, False, str(column), str(column), 1)
             scores.append((column, score))
-            current_board.grid = deepcopy(state)
+            current_board.grid = self.deepcopy(state)
         self.storage_function.close_files()
         return scores
 
@@ -43,7 +42,7 @@ class Minimax:
             return min(scores), line_number
 
     def possible_new_states(self, state, is_maximising):
-        current_board = Board(*self.game_setup_arguments, deepcopy(state))
+        current_board = Board(*self.game_setup_arguments, self.deepcopy(state))
         player_marker = self.maximising_marker if is_maximising else self.minimising_marker
         possible_states = []
         columns = []
@@ -51,7 +50,7 @@ class Minimax:
             current_board.make_move(column, player_marker)
             possible_states.append(current_board.grid)
             columns.append(column)
-            current_board.grid = deepcopy(state)
+            current_board.grid = self.deepcopy(state)
         return zip(possible_states, columns)
 
     def evaluate(self, state):
@@ -63,6 +62,10 @@ class Minimax:
                 return -1
             return 0
         return None
+
+    @staticmethod
+    def deepcopy(state):
+        return [list(column) for column in state]
 
     def next_best_move(self, is_maximising):
         return 0
