@@ -30,7 +30,7 @@ class Minimax:
         scores = []
         lines_used = 0
         line_number = 1
-        for possible_state, column in self.possible_new_states(deepcopy(state), is_maximising):
+        for possible_state, column in self.possible_new_states(state, is_maximising):
             score, line_number = self.minimax(possible_state, not is_maximising, column, previous_moves + str(column), depth + 1)
             scores.append(score)
             lines_used += 1
@@ -55,7 +55,7 @@ class Minimax:
         return zip(possible_states, columns)
 
     def evaluate(self, state):
-        current_board = Board(*self.game_setup_arguments, deepcopy(state))
+        current_board = Board(*self.game_setup_arguments, state)
         if current_board.check_victory()[0] is True or len(current_board.get_valid_moves()) == 0:
             if current_board.check_victory()[1] == self.maximising_marker:
                 return 1
