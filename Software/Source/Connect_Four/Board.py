@@ -1,5 +1,4 @@
-from Validator import Validator
-
+from time import process_time
 
 class Board:
     def __init__(self, rows, columns, empty, player_1, player_2, robot, grid=None):
@@ -58,41 +57,107 @@ class Board:
         """
         :return: True: if the game has been won; else: False
         """
-        test = {
-            "column": [1, 0],
-            "row": [0, 1],
-            "diagonal_1": [1, 1],
-            "diagonal_2": [1, -1],
-        }
-        coordinates = []
-        for column_index in range(3, self.number_of_columns, 4):
-            for row_index in range(self.number_of_rows):
-                if self.grid[row_index][column_index]:
-                    coordinates.append([row_index, column_index])
-        for column_index in range(self.number_of_columns):
-            for row_index in range(3, self.number_of_rows, 4):
-                if (self.grid[row_index][column_index]) and ([row_index, column_index] not in coordinates):
-                    coordinates.append([row_index, column_index])
+        coordinates = [[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [2, 0], [2, 1], [2, 2], [2, 4], [2, 5], [2, 6]]
+
         for coordinate in coordinates:
-            marker = self.grid[coordinate[0]][coordinate[1]]
-            for pattern in test.values():
-                positive = True
-                connected = []
-                for _ in range(2):
-                    row_check = coordinate[0]
-                    column_check = coordinate[1]
-                    while (Validator(row_check).range_validator(0, self.number_of_rows, equal_to_start=True) and
-                           Validator(column_check).range_validator(0, self.number_of_columns, equal_to_start=True)) and \
-                            (self.grid[row_check][column_check] == marker):
-                        if [row_check, column_check] not in connected:
-                            connected.append([row_check, column_check])
-                        if positive:
-                            row_check += pattern[0]
-                            column_check += pattern[1]
-                        else:
-                            row_check -= pattern[0]
-                            column_check -= pattern[1]
-                    positive = False
-                if len(connected) >= 4:
-                    return True, self.player_number_to_marker[marker]
+            row = coordinate[0]
+            col = coordinate[1]
+            if self.grid[row][col] != self.empty_marker:
+                marker = self.player_number_to_marker[self.grid[row][col]]
+
+                # check horizontal
+                if col + 3 < self.number_of_columns:
+                    if self.grid[row][col] == self.grid[row][col + 1] == self.grid[row][col + 2] == self.grid[row][col + 3]:
+                        return True, marker
+                if col + 2 < self.number_of_columns and col - 1 >= 0:
+                    if self.grid[row][col - 1] == self.grid[row][col] == self.grid[row][col + 1] == self.grid[row][col + 2]:
+                        return True, marker
+                if col + 1 < self.number_of_columns and col - 2 >= 0:
+                    if self.grid[row][col - 2] == self.grid[row][col - 1] == self.grid[row][col] == self.grid[row][col + 1]:
+                        return True, marker
+                if col - 3 >= 0:
+                    if self.grid[row][col - 3] == self.grid[row][col - 2] == self.grid[row][col - 1] == self.grid[row][col]:
+                        return True, marker
+
+                # check vertical
+                if row + 3 < self.number_of_rows:
+                    if self.grid[row][col] == self.grid[row + 1][col] == self.grid[row + 2][col] == self.grid[row + 3][col]:
+                        return True, marker
+                if row + 2 < self.number_of_rows and row - 1 >= 0:
+                    if self.grid[row - 1][col] == self.grid[row][col] == self.grid[row + 1][col] == self.grid[row + 2][col]:
+                        return True, marker
+                if row + 1 < self.number_of_rows and row - 2 >= 0:
+                    if self.grid[row - 2][col] == self.grid[row - 1][col] == self.grid[row][col] == self.grid[row + 1][col]:
+                        return True, marker
+                if row - 3 >= 0:
+                    if self.grid[row - 3][col] == self.grid[row - 2][col] == self.grid[row - 1][col] == self.grid[row][col]:
+                        return True, marker
+
+                # check diagonal negative
+                if col + 3 < self.number_of_columns and row + 3 < self.number_of_rows:
+                    if self.grid[row][col] == self.grid[row + 1][col + 1] == self.grid[row + 2][col + 2] == self.grid[row + 3][col + 3]:
+                        return True, marker
+                if col + 2 < self.number_of_columns and col - 1 >= 0 and row + 2 < self.number_of_rows and row - 1 >= 0:
+                    if self.grid[row - 1][col - 1] == self.grid[row][col] == self.grid[row + 1][col + 1] == self.grid[row + 2][col + 2]:
+                        return True, marker
+                if col + 1 < self.number_of_columns and col - 2 >= 0 and row + 1 < self.number_of_rows and row - 2 >= 0:
+                    if self.grid[row - 2][col - 2] == self.grid[row - 1][col - 1] == self.grid[row][col] == self.grid[row + 1][col + 1]:
+                        return True, marker
+                if col - 3 >= 0 and row - 3 >= 0:
+                    if self.grid[row - 3][col - 3] == self.grid[row - 2][col - 2] == self.grid[row - 1][col - 1] == self.grid[row][col]:
+                        return True, marker
+
+                # check diagonal positive
+                if col + 3 < self.number_of_columns and row - 3 >= 0:
+                    if self.grid[row - 3][col + 3] == self.grid[row - 2][col + 2] == self.grid[row - 1][col + 1] == self.grid[row][col]:
+                        return True, marker
+                if col + 2 < self.number_of_columns and col - 1 >= 0 and row + 1 < self.number_of_rows and row - 2 >= 0:
+                    if self.grid[row - 2][col + 2] == self.grid[row - 1][col + 1] == self.grid[row][col] == self.grid[row + 1][col - 1]:
+                        return True, marker
+                if col + 1 < self.number_of_columns and col - 2 >= 0 and row + 2 < self.number_of_rows and row - 1 >= 0:
+                    if self.grid[row - 1][col + 1] == self.grid[row][col] == self.grid[row + 1][col - 1] == self.grid[row + 2][col - 2]:
+                        return True, marker
+                if col - 3 >= 0 and row + 3 < self.number_of_rows:
+                    if self.grid[row][col] == self.grid[row + 1][col - 1] == self.grid[row + 2][col - 2] == self.grid[row + 3][col - 3]:
+                        return True, marker
+
         return False, None
+
+
+if __name__ == '__main__':
+    a = Board(rows=6, columns=7, empty=0, player_1=1, player_2=2, robot='R')
+
+    a.grid = [
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 2, 1],
+        [1, 1, 2, 1, 1, 2, 2],
+        [2, 2, 1, 1, 2, 1, 1],
+    ]
+
+    a.grid = [
+        [1, 0, 0, 0, 0, 0, 1],
+        [2, 0, 2, 0, 1, 2, 0],
+        [1, 2, 2, 2, 0, 0, 2],
+        [0, 0, 2, 2, 2, 0, 1],
+        [0, 0, 0, 2, 0, 0, 0],
+        [1, 2, 0, 0, 0, 1, 1]
+    ]
+
+    a.grid = [
+        [0, 0, 0, 1, 0, 0, 2],
+        [0, 0, 0, 0, 0, 2, 0],
+        [1, 1, 2, 2, 2, 1, 1],
+        [0, 0, 0, 2, 1, 0, 1],
+        [0, 2, 2, 2, 1, 1, 0],
+        [2, 2, 0, 1, 2, 1, 1]
+    ]
+
+    print(a.check_victory())
+
+    start_time = process_time()
+    for i in range(1000000):
+        a.check_victory()
+    elapsed_time = process_time() - start_time
+    print(elapsed_time)
