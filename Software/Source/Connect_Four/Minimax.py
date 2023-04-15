@@ -55,10 +55,11 @@ class Minimax:
 
     def evaluate(self, state):
         current_board = Board(*self.game_setup_arguments, state)
-        if current_board.check_victory()[0] is True or len(current_board.get_valid_moves()) == 0:
-            if current_board.check_victory()[1] == self.maximising_marker:
+        victory_status = current_board.check_victory()
+        if victory_status[0] is True or len(current_board.get_valid_moves()) == 0:
+            if victory_status[1] == self.maximising_marker:
                 return 1
-            elif current_board.check_victory()[1] == self.minimising_marker:
+            elif victory_status[1] == self.minimising_marker:
                 return -1
             return 0
         return None
