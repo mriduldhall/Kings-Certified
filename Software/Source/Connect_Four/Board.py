@@ -1,5 +1,3 @@
-from time import process_time
-
 class Board:
     def __init__(self, rows, columns, empty, player_1, player_2, robot, grid=None):
         self.number_of_rows = rows
@@ -122,42 +120,3 @@ class Board:
                         return True, marker
 
         return False, None
-
-
-if __name__ == '__main__':
-    a = Board(rows=6, columns=7, empty=0, player_1=1, player_2=2, robot='R')
-
-    a.grid = [
-        [0, 0, 0, 1, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 2, 1],
-        [1, 1, 2, 1, 1, 2, 2],
-        [2, 2, 1, 1, 2, 1, 1],
-    ]
-
-    a.grid = [
-        [1, 0, 0, 0, 0, 0, 1],
-        [2, 0, 2, 0, 1, 2, 0],
-        [1, 2, 2, 2, 0, 0, 2],
-        [0, 0, 2, 2, 2, 0, 1],
-        [0, 0, 0, 2, 0, 0, 0],
-        [1, 2, 0, 0, 0, 1, 1]
-    ]
-
-    a.grid = [
-        [0, 0, 0, 1, 0, 0, 2],
-        [0, 0, 0, 0, 0, 2, 0],
-        [1, 1, 2, 2, 2, 1, 1],
-        [0, 0, 0, 2, 1, 0, 1],
-        [0, 2, 2, 2, 1, 1, 0],
-        [2, 2, 0, 1, 2, 1, 1]
-    ]
-
-    print(a.check_victory())
-
-    start_time = process_time()
-    for i in range(1000000):
-        a.check_victory()
-    elapsed_time = process_time() - start_time
-    print(elapsed_time)
