@@ -31,15 +31,22 @@ class Minimax:
         line_number = 1
         for possible_state, column in self.possible_new_states(state, is_maximising):
             score, line_number = self.minimax(possible_state, not is_maximising, column, previous_moves + str(column), depth + 1)
-            scores.append(score)
-            lines_used += 1
+            if score is not None:
+                scores.append(score)
+                lines_used += 1
+                if (is_maximising and score == 1) or (not is_maximising and score == -1):
+                    break
         line_number = str(int(line_number) - lines_used + 1)
         if is_maximising:
-            line_number = self.storage_function.write_node(str(previous_move), str(max(scores)), depth, line_number)
-            return max(scores), line_number
+            if scores:
+                line_number = self.storage_function.write_node(str(previous_move), str(max(scores)), depth, line_number)
+                return max(scores), line_number
+            return None, None
         else:
-            line_number = self.storage_function.write_node(str(previous_move), str(min(scores)), depth, line_number)
-            return min(scores), line_number
+            if scores:
+                line_number = self.storage_function.write_node(str(previous_move), str(min(scores)), depth, line_number)
+                return min(scores), line_number
+            return None, None
 
     def possible_new_states(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, self.deepcopy(state))
