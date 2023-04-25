@@ -1,19 +1,16 @@
-from random import choice
 from Board import Board
+from Minimax import Minimax
 
 
 class Game:
     def __init__(self):
         self.board = Board()
-
-    def make_move(self, place_coord, player_marker):
-        row, column = place_coord
-        self.board.grid[int(row)][int(column)] = player_marker
-
+        self.minimax = Minimax(self.board.grid, self.board.robot_marker, self.board.player_1_marker)
+        
     def make_player_move(self, player_number):
         column = str(input(f"Enter column (0 - 2): "))
         row = str(input(f"Enter row (0 - 2): "))
-
+        print(player_number)
         marker = self.board.player_number_to_marker[player_number]
         positions = ["0", "1", "2"]
         print(self.board.get_valid_moves())
@@ -21,11 +18,14 @@ class Game:
             print("Invalid move.")
             column = (input(f"Enter column (0 - 2): "))
             row = (input(f"Enter row (0 - 2): "))
-
-        self.make_move((int(row), int(column)), marker)
+        
+        self.board.make_move((int(row), int(column)), marker)
+    
+    # def make_robot_move(self):
+    #     self.board.make_move(choice(self.board.get_valid_moves()), "R")
 
     def make_robot_move(self):
-        self.make_move(choice(self.board.get_valid_moves()), "R")
+        self.board.make_move(self.minimax.next_logical_move(self.board.grid, False), self.board.robot_marker)
 
     def play_game(self):
         is_player_game = input("Play against Robot or another Player: \n 1 for player \n 0 for robot\n")
@@ -50,7 +50,7 @@ class Game:
         while not self.board.check_victory()[0] and len(self.board.get_valid_moves()) > 0:
             self.board.print_board()
             print("")
-
+            
             if current_turn == 1:
                 print("Player 1 turn: ")
                 self.make_player_move(1)
@@ -68,11 +68,11 @@ class Game:
 
             else:
                 print("Error")
-
+        
         winner = not current_turn
-
+        
         self.board.print_board()
-
+        
         if not self.board.get_valid_moves() and not self.board.check_victory()[0]:
             print("Draw")
         elif winner:
@@ -81,6 +81,7 @@ class Game:
             print("Player 2 wins")
         else:
             print("Robot wins")
+
 
 
 if __name__ == "__main__":
