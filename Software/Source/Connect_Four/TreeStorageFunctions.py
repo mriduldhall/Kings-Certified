@@ -1,5 +1,6 @@
 from pathlib import Path
 from os import fsync
+import linecache
 
 
 class TreeStorageFunction:
@@ -35,3 +36,25 @@ class TreeStorageFunction:
         if self.append_count >= self.flush_interval:
             self.refresh_files()
         return str(self.files_line_count[depth - 1])
+
+    def read_node(self, depth, line):
+        line_contents = linecache.getline((self.directory_name + "/" + str(depth) + ".txt"), line)
+        return (line_contents.strip()).split(self.seperator)
+
+    def get_child_nodes_v1(self, depth, start_line, end_line):
+        nodes = []
+        for current_line in range(start_line, end_line + 1):
+            nodes.append(self.read_node(depth, current_line))
+        return nodes
+
+    def get_child_nodes_v2(self, depth, start_line):
+        nodes = []
+        counter = 0
+        while len(nodes) <= 7:
+            line_contents = self.read_node(depth, int(start_line) + counter)
+            if nodes:
+                if line_contents[0] <= nodes[-1][0]:
+                    return nodes
+            nodes.append(line_contents)
+            counter += 1
+        return nodes

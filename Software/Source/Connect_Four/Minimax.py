@@ -1,5 +1,6 @@
 from Board import Board
 from TreeStorageFunctions import TreeStorageFunction
+import random
 
 
 class Minimax:
@@ -8,6 +9,8 @@ class Minimax:
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
         self.storage_function = TreeStorageFunction()
+        self.current_line = 1
+        self.current_depth = 1
 
     def best_move(self, state):
         self.storage_function.max_depth = sum([row.count(self.game_setup_arguments[2]) for row in state])
@@ -76,10 +79,27 @@ class Minimax:
         return [list(column) for column in state]
 
     def next_best_move(self, is_maximising):
-        return 0
+        best_moves = []
+        child_nodes = self.storage_function.get_child_nodes_v2(self.current_depth, self.current_line)
+        child_scores = [int(node[1]) for node in child_nodes]
+        best_score = max(child_scores) if is_maximising else min(child_scores)
+        for node in child_nodes:
+            if int(node[1]) == best_score:
+                best_moves.append(node)
+        move = int(random.choice(best_moves)[0])
+        return move
+
 
     def follow_move(self, column):
-        pass
+        child_nodes = self.storage_function.get_child_nodes_v2(self.current_depth, self.current_line)
+        for i in range(len(child_nodes)):
+            if int(child_nodes[i][0]) == column:
+                if not child_nodes[i][2]:
+                    print("Alpha beta error")
+                    return 0
+                self.current_depth += 1
+                self.current_line = child_nodes[i][2]
+
 
 
 if __name__ == '__main__':

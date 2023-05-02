@@ -93,13 +93,13 @@ class Game:
 if __name__ == '__main__':
     game = Game()
     while True:
-        # game.board.grid = [
-        #     [0, 0, 0, 0, 0, 0, 0],
-        #     [1, 0, 0, 'R', 1, 'R', 'R'],
-        #     ['R', 1, 'R', 1, 'R', 1, 1],
-        #     [1, 1, 'R', 1, 'R', 1, 'R'],
-        #     ['R', 'R', 1, 'R', 'R', 1, 1],
-        #     ['R', 1, 'R', 1, 1, 'R', 'R'],
-        # ]
+        game.board.grid = [
+        [0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0, "R", 1, "R", "R"],
+        ["R", 1, "R", 1, "R", 1, 1],
+        [1, 1, "R", 1, "R", 1, "R"],
+        ["R", "R", 1, "R", "R", 1, 1],
+        ["R", 1, "R", 1, 1, "R", "R"],
+    ]
         game.play_game()
         # game.minimax.current_node = game.minimax.tree
