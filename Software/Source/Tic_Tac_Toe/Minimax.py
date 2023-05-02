@@ -1,6 +1,6 @@
 from Board import Board
 from TreeStorageFunctions import TreeStorageFunction
-
+from random import choice
 
 class Minimax:
     def __init__(self, initial_state, maximising_marker, minimising_marker):
@@ -10,13 +10,16 @@ class Minimax:
         # self.game_setup_arguments = game_setup_arguments
         self.is_maximising = False
         self.storage_function = TreeStorageFunction()
+        self.current_line = 1
+        self.final_line = 9
+        self.current_depth = 1
 
     @staticmethod
     def deepcopy(state):
         return [list(row) for row in state]
 
     def evaluate(self, state):
-        current_board = Board(state)
+        current_board = Board(self.deepcopy(state))
         victory_status = current_board.check_victory()
         # print(victory_status)
         if victory_status[0] is True or len(current_board.get_valid_moves()) == 0:
@@ -28,7 +31,7 @@ class Minimax:
         return None
 
     def possible_new_states(self, state, is_maximising):
-        current_board = Board(state)
+        current_board = Board(self.deepcopy(state))
         player_marker = self.maximising_marker if is_maximising else self.minimising_marker
         possible_states = []
         positions = []
@@ -52,25 +55,18 @@ class Minimax:
 
         for possible_state, position in self.possible_new_states(state, is_maximising):
             score, line_number = self.minimax(possible_state, not is_maximising, position, previous_moves + str(position), depth + 1)
-            if score is not None:
-                scores.append(score)
-                lines_used += 1
-                if (is_maximising and score == 1) or (not is_maximising and score == -1):
-                    break
-
+            scores.append(score)
+            lines_used += 1
+            
         line_number = str(int(line_number) - lines_used + 1)
         
         if is_maximising:
-            if scores:
-                line_number = self.storage_function.write_node(str(previous_move), str(max(scores)), depth, line_number)
-                return max(scores), line_number
-            return None, None
-
+            line_number = self.storage_function.write_node(str(previous_move), str(max(scores)), depth, line_number)
+            return max(scores), line_number
+        
         else:
-            if scores:
-                line_number = self.storage_function.write_node(str(previous_move), str(min(scores)), depth, line_number)
-                return min(scores), line_number
-            return None, None
+            line_number = self.storage_function.write_node(str(previous_move), str(min(scores)), depth, line_number)
+            return min(scores), line_number
 
     def best_move(self, state):
         self.storage_function.max_depth = sum([row.count("-") for row in state])
@@ -88,49 +84,49 @@ class Minimax:
         
         return scores
 
-    def next_logical_move(self, state, is_maximising):
-        moves = self.best_move(state)
-        best_pos = moves[0]
-        worst_pos = moves[0]
-        # print(f"Moves: {moves}")
-        # print(f"Best position: {best_pos}")
-        # print(f"Worst position: {worst_pos}")
-        
-        # print(best_pos, worst_pos)
-        for move in moves:
-            # print(f"Move:{move}")
-            if int(move[1]) > int(best_pos[1]):
-                best_pos = move
-            elif int(move[1]) < int(worst_pos[1]):
-                worst_pos = move
-        if is_maximising:
-            return best_pos[0]
-        else:
-            return worst_pos[0]
 
-
+    def next_best_move(self, is_maximising):
+        child_nodes = self.storage_function.get_layer(self.current_depth, self.current_line, self.final_line)
+        best_moves = []
+        child_scores = [int(node[1]) for node in child_nodes]
+        best_score = max(child_scores) if is_maximising else min(child_scores)
+        # print("Child nodes: ", child_nodes)
+        # print("Child Scores:", child_scores)
+        # print("Best score:", best_score)
+        for node in child_nodes:
+            if str(node[1]) == str(best_score):
+                best_moves.append(node)
+        # print("Best moves", best_moves)
+        return best_moves
+    
+    def follow_move(self, move):
+        # print("Depth b4:", self.current_depth)
+        # print("Lines b4:", self.current_line, self.final_line)
+        child_nodes = self.storage_function.get_layer(self.current_depth, self.current_line, self.final_line)
+        # print("Child nodes from follow:", child_nodes)
+        for count in range(len(child_nodes)-1):
+            if move == child_nodes[count][0]:
+                # print("Count:", count)
+                self.current_depth += 1
+                self.current_line = int(child_nodes[count][2])
+                self.final_line = int(child_nodes[count+1][2])
+               
+        # print("Depth after:", self.current_depth)
+        # print("Lines after:", self.current_line, self.final_line)
+    
+    
+    
 if __name__ == "__main__":
     a = Board()
+    # a.grid = [
+    #     ["X", "-", "O"],
+    #     ["X", "-", "O"],
+    #     ["-", "-", "X"]
+    # ]
     
-    a.grid = [
-        ["X", "-", "O"],
-        ["X", "-", "O"],
-        ["-", "-", "X"]
-    ]
-    
-    b = Minimax(a.grid, "X", "O")
+    b = Minimax(a.grid, "O", "X")
     # this means that first marker is the one whose choice will be taken?
+    print(b.best_move(a.grid))
     
-    # print(b.evaluate(a.grid))
-    # print(b.minimax(a.grid, True))
-    # print(b.best_move(a.grid))
-    a.grid = [
-        ["X", "-", "-"],
-        ["-", "O", "-"],
-        ["X", "-", "-"]
-    ]
-    # for grid in b.possible_new_states(a.grid, True):
-    #     a.print_board(grid)
-        
-    print(b.next_logical_move(a.grid, False))
-    # the boolean here for is_maximising is used in conjunction with the initialising of minimax and if this is true then the first item entered into the
+    # print(b.storage_function.get_layer(1, b.current_line, b.final_line))
+    # print(b.next_best_move(True))

@@ -23,6 +23,8 @@ class Board:
 
     
     def make_move(self, place_coord, player_marker):
+        # print("Trying to make move: " + str(place_coord))
+        # print("Marker" + str(player_marker))
         row, column = place_coord
         self.grid[int(row)][int(column)] = player_marker
         
@@ -37,11 +39,13 @@ class Board:
             print(grid[row])
     
     
-    def get_valid_moves(self):
+    def get_valid_moves(self, state=True):
+        if state:
+            state = self.grid
         available_spaces = []
-        for row in range(len(self.grid)):
-            for column in range(len(self.grid[row])):
-                if str(self.grid[row][column]) == str(self.empty_marker):
+        for row in range(len(state)):
+            for column in range(len(state[row])):
+                if str(state[row][column]) == str(self.empty_marker):
                     available_spaces.append((str(row), str(column)))
         
         return available_spaces
