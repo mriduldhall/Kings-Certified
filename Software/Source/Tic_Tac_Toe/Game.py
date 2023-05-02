@@ -13,7 +13,6 @@ class Game:
         column = str(input(f"Enter column (0 - 2): "))
         marker = self.board.player_number_to_marker[player_number]
         positions = ["0", "1", "2"]
-        # print("Valid moves:", self.board.get_valid_moves())
         while row not in positions or column not in positions or (row, column) not in self.board.get_valid_moves():
             print("Invalid move.")
             row = (input(f"Enter row (0 - 2): "))
@@ -22,13 +21,8 @@ class Game:
         self.board.make_move(move, marker)
         self.minimax.follow_move(move)
 
-
-    # def make_robot_move(self):
-    #     self.board.make_move(choice(self.board.get_valid_moves()), "R")
-
     def make_robot_move(self, is_maximising):
         move = choice(self.minimax.next_best_move(is_maximising))[0]
-        # print(f"Chosen move: {move}")
         self.board.make_move(move, self.board.robot_marker)
         self.minimax.follow_move(move)
 
@@ -75,8 +69,7 @@ class Game:
                 print("Robot turn: ")
                 self.make_robot_move(is_maximising)
                 current_turn = 1
-                # print(self.minimax.current_depth)
-                # print(self.minimax.current_line, self.minimax.final_line)
+
             else:
                 print("Error")
         
@@ -104,7 +97,4 @@ if __name__ == "__main__":
     #     ["O", 0, "X"]
     # ]
 
-    # a.print_board()
-    # print(a.get_valid_moves())
-    # print(a.check_victory())
     a.play_game()

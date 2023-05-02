@@ -101,12 +101,11 @@ class Minimax:
                 self.current_line = child_nodes[i][2]
 
 
-
 if __name__ == '__main__':
     a = Board(rows=6, columns=7, empty=0, player_1=1, player_2=2, robot='R')
     a.grid = [
         [0, 0, 0, 0, 0, 0, 0],
-        [2, 0, 2, 1, 2, 1, 1],
+        [2, 0, 0, 1, 2, 1, 1],
         [1, 2, 1, 2, 1, 2, 2],
         [2, 2, 1, 2, 1, 2, 1],
         [1, 1, 2, 1, 1, 2, 2],

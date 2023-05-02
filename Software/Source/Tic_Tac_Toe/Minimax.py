@@ -1,6 +1,6 @@
 from Board import Board
 from TreeStorageFunctions import TreeStorageFunction
-from random import choice
+
 
 class Minimax:
     def __init__(self, initial_state, maximising_marker, minimising_marker):
@@ -21,7 +21,6 @@ class Minimax:
     def evaluate(self, state):
         current_board = Board(self.deepcopy(state))
         victory_status = current_board.check_victory()
-        # print(victory_status)
         if victory_status[0] is True or len(current_board.get_valid_moves()) == 0:
             if victory_status[1] == self.maximising_marker:
                 return 1
@@ -84,37 +83,24 @@ class Minimax:
         
         return scores
 
-
     def next_best_move(self, is_maximising):
         child_nodes = self.storage_function.get_layer(self.current_depth, self.current_line, self.final_line)
         best_moves = []
         child_scores = [int(node[1]) for node in child_nodes]
         best_score = max(child_scores) if is_maximising else min(child_scores)
-        # print("Child nodes: ", child_nodes)
-        # print("Child Scores:", child_scores)
-        # print("Best score:", best_score)
         for node in child_nodes:
             if str(node[1]) == str(best_score):
                 best_moves.append(node)
-        # print("Best moves", best_moves)
         return best_moves
     
     def follow_move(self, move):
-        # print("Depth b4:", self.current_depth)
-        # print("Lines b4:", self.current_line, self.final_line)
         child_nodes = self.storage_function.get_layer(self.current_depth, self.current_line, self.final_line)
-        # print("Child nodes from follow:", child_nodes)
         for count in range(len(child_nodes)-1):
             if move == child_nodes[count][0]:
-                # print("Count:", count)
                 self.current_depth += 1
                 self.current_line = int(child_nodes[count][2])
                 self.final_line = int(child_nodes[count+1][2])
-               
-        # print("Depth after:", self.current_depth)
-        # print("Lines after:", self.current_line, self.final_line)
-    
-    
+
     
 if __name__ == "__main__":
     a = Board()
@@ -125,8 +111,5 @@ if __name__ == "__main__":
     # ]
     
     b = Minimax(a.grid, "O", "X")
-    # this means that first marker is the one whose choice will be taken?
+
     print(b.best_move(a.grid))
-    
-    # print(b.storage_function.get_layer(1, b.current_line, b.final_line))
-    # print(b.next_best_move(True))
