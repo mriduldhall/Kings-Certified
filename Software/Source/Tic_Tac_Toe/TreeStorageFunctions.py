@@ -2,7 +2,6 @@ from pathlib import Path
 from os import fsync
 from linecache import getline
 
-
 class TreeStorageFunction:
     def __init__(self, max_depth=0, directory_name='TreeFiles', flush_interval=1000000, seperator=','):
         self.max_depth = max_depth
@@ -47,19 +46,43 @@ class TreeStorageFunction:
 
     def coord_value(self, coord):
         row, column = coord
+        # print("Coord value cood", coord)
         return int(row) * 3 + int(column)
 
-    def get_layer(self, depth, line_start, line_end):
+    def get_layer(self, depth, line_start):
         with open("TreeFiles/" + str(depth) + '.txt', "r") as file_in:
             lines = [line.rstrip() for line in file_in]
         file_in.close()
         
         layer = []
-        for actual_line in range(line_start-1, line_end-1):
-            line = lines[actual_line]
+        line_num = line_start - 1 
+        if depth != 9:
+            while self.coord_value((lines[line_num][2], lines[line_num][7])) < self.coord_value((lines[line_num+1][2], lines[line_num+1][7])):
+                line = lines[line_num]
+                if line[11] == "-":
+                    layer.append([(line[2], line[7]), line[11:13], line[14:]])
+                else:
+                    layer.append([(line[2], line[7]), line[11:12], line[13:]])
+                line_num += 1
+                # print(line_num)
+                # print(layer[-1])
+            line = lines[line_num]
             if line[11] == "-":
                 layer.append([(line[2], line[7]), line[11:13], line[14:]])
             else:
                 layer.append([(line[2], line[7]), line[11:12], line[13:]])
-
+        elif depth == 9:
+            line = lines[line_num]
+            if line[11] == "-":
+                layer.append([(line[2], line[7]), line[11:13], line[14:]])
+            else:
+                layer.append([(line[2], line[7]), line[11:12], line[13:]])
+        
         return layer
+
+if __name__ == "__main__":
+    a = TreeStorageFunction()
+    depth = 2
+    start = 33
+    fin = 41   
+    print(a.get_layer(depth, start, fin))

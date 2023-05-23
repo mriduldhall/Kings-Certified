@@ -23,6 +23,7 @@ class Game:
 
     def make_robot_move(self, is_maximising):
         move = choice(self.minimax.next_best_move(is_maximising))[0]
+        # print(f"Chosen move: {move}")
         self.board.make_move(move, self.board.robot_marker)
         self.minimax.follow_move(move)
 
@@ -87,14 +88,6 @@ class Game:
             print("Robot wins")
 
 
-
 if __name__ == "__main__":
     a = Game()
-
-    # a.board = [
-    #     ["O", 0, "O"],
-    #     ["X", "X", 0],
-    #     ["O", 0, "X"]
-    # ]
-
     a.play_game()
