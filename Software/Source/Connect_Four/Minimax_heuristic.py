@@ -57,7 +57,6 @@ class Minimax:
             current_board.grid = self.deepcopy(state)
         return zip(possible_states, columns)
 
-
     @staticmethod
     def deepcopy(state):
         return [list(column) for column in state]
@@ -72,7 +71,6 @@ class Minimax:
                 best_moves.append(node)
         move = int(random.choice(best_moves)[0])
         return move
-
 
     def follow_move(self, column):
         child_nodes = self.storage_function.get_child_nodes_v2(self.current_depth, self.current_line)
@@ -107,7 +105,7 @@ class Minimax:
         else:
             return (curStreak >> 4 << 4) | ((curStreak & 15) << 1) | currentSpotState
 
-    def evaluate(self, connect4State) -> float:
+    def evaluate(self, connect4State: list[list[int]]) -> float:
         movableColumns = [0] * 7
         totalNumberOfFreeSpots = 0
         cumulativeBoardPlayer1 = [0] * 6 * 7 * 4
@@ -118,18 +116,16 @@ class Minimax:
             for col in range(7):
                 streakVectorPlayer1 = [
                     0 if col == 0 else
-                    cumulativeBoardPlayer1[
-                        self.ix(row, col - 1, 0)]
+                    cumulativeBoardPlayer1[self.ix(row, col - 1, 0)]
                     ,
-                    0 if (row == 0 or col == 0) else cumulativeBoardPlayer1[
-                        self.ix(row - 1, col - 1, 1)]
+                    0 if (row == 0 or col == 0) else
+                    cumulativeBoardPlayer1[self.ix(row - 1, col - 1, 1)]
                     ,
                     0 if row == 0 else
-                    cumulativeBoardPlayer1[
-                        self.ix(row - 1, col, 2)]
+                    cumulativeBoardPlayer1[self.ix(row - 1, col, 2)]
                     ,
-                    0 if (row == 0 or col == 6) else cumulativeBoardPlayer1[
-                        self.ix(row - 1, col + 1, 3)]
+                    0 if (row == 0 or col == 6) else
+                    cumulativeBoardPlayer1[self.ix(row - 1, col + 1, 3)]
                 ]
                 streakVectorPlayer2 = [
                     0 if col == 0 else
@@ -165,12 +161,11 @@ class Minimax:
                 ]
 
                 for i in range(4):
-                    if (newStreakVectorPlayer1[i] >= 16):
+                    if newStreakVectorPlayer1[i] >= 16:
                         player1Score += self.sumOfFirstFourBits(
                             newStreakVectorPlayer1[i]
                         )
-                for i in range(4):
-                    if (newStreakVectorPlayer2[i] >= 16):
+                    if newStreakVectorPlayer2[i] >= 16:
                         player2Score += self.sumOfFirstFourBits(
                             newStreakVectorPlayer2[i]
                         )
@@ -178,45 +173,18 @@ class Minimax:
                     cumulativeBoardPlayer1[self.ix(row, col, i)] = newStreakVectorPlayer1[i]
                     cumulativeBoardPlayer2[self.ix(row, col, i)] = newStreakVectorPlayer2[i]
 
-
-                if (31 in newStreakVectorPlayer1):
+                if 31 in newStreakVectorPlayer1:
                     # Is End State
-                    if self.maximising_marker == 1:
-                        return float('inf')
-                    else:
-                        return float('')
-                    # return {
-                    #     'player1Score': float('inf'),
-                    #     'player2Score': float('-inf'),
-                    #     'winner': 'player1'  # For debugging
-                    # }
-                if (31 in newStreakVectorPlayer2):
+                    return float('inf') if self.maximising_marker == 1 else float('-inf')
+                if 31 in newStreakVectorPlayer2:
                     # Is End State
-                    if self.maximising_marker == 2:
-                        return float('inf')
-                    else:
-                        return float('-inf')
-                    # return {
-                    #     'player1Score': float('-inf'),
-                    #     'player2Score': float('inf'),
-                    #     'winner': 'player2'  # For debugging
-                    # }
+                    return float('inf') if self.maximising_marker == 2 else float('-inf')
 
         if totalNumberOfFreeSpots == 0:
             if self.maximising_marker == 1:
                 return float(player1Score - player2Score)
             else:
                 return float(player2Score - player1Score)
-            # return {
-            #     'player1Score': player1Score,
-            #     'player2Score': player2Score,
-            #     'winner': 'tie'  # For debugging
-            # }
-        # return {
-        #     'player1Score': player1Score,
-        #     'player2Score': player2Score,
-        #     'winner': 'none'  # For debugging
-        # }
         if self.maximising_marker == 1:
             return float(player1Score - player2Score)
         else:
