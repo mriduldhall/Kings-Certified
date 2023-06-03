@@ -89,7 +89,6 @@ class Minimax:
         move = int(random.choice(best_moves)[0])
         return move
 
-
     def follow_move(self, column):
         child_nodes = self.storage_function.get_child_nodes_v2(self.current_depth, self.current_line)
         for i in range(len(child_nodes)):
