@@ -2,11 +2,11 @@ from Board import Board
 
 
 class Minimax:
-    def __init__(self, maximising_marker, minimising_marker, game_setup_arguments):
+    def __init__(self, maximising_marker, minimising_marker, game_setup_arguments, max_depth):
         self.maximising_marker = maximising_marker
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
-        self.max_depth = 5
+        self.max_depth = max_depth
 
     def best_move(self, state):
         current_board = Board(*self.game_setup_arguments, self.deepcopy(state))
@@ -55,12 +55,6 @@ class Minimax:
     @staticmethod
     def deepcopy(state):
         return [list(column) for column in state]
-
-    def next_best_move(self, is_maximising):
-        pass
-
-    def follow_move(self, column):
-        pass
 
     @staticmethod
     def sum_of_first_four_bits(x):
@@ -179,6 +173,12 @@ class Minimax:
             return float(player_one_score - player_two_score)
         return float(player_two_score - player_one_score)
 
+    def next_best_move(self, is_maximising):
+        pass
+
+    def follow_move(self, column):
+        pass
+
 
 if __name__ == '__main__':
     a = Board(rows=6, columns=7, empty=0, player_1=1, player_2=2, robot=2)
@@ -215,6 +215,6 @@ if __name__ == '__main__':
     #     [1, 2, 1, 2, 2, 1, 1],
     # ]
 
-    b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"])
+    b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"], 6)
     moves = b.best_move(a.grid)
     print(moves)
