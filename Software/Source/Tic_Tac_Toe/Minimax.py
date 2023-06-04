@@ -5,8 +5,8 @@ from TreeStorageFunctions import TreeStorageFunction
 class Minimax:
     def __init__(self, initial_state, maximising_marker, minimising_marker):
         self.initial_state = initial_state 
-        self.maximising_marker = maximising_marker  # player who is to play next
-        self.minimising_marker = minimising_marker  # opponent
+        self.maximising_marker = maximising_marker
+        self.minimising_marker = minimising_marker
         self.is_maximising = False
         self.storage_function = TreeStorageFunction()
         self.current_line = 1
@@ -19,7 +19,6 @@ class Minimax:
     def evaluate(self, state):
         current_board = Board(self.deepcopy(state))
         victory_status = current_board.check_victory()
-        # print(victory_status)
         if victory_status[0] is True or len(current_board.get_valid_moves()) == 0:
             if victory_status[1] == self.maximising_marker:
                 return 1

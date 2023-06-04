@@ -22,8 +22,6 @@ class Board:
             self.grid = init_grid
 
     def make_move(self, place_coord, player_marker):
-        # print("Trying to make move: " + str(place_coord))
-        # print("Marker" + str(player_marker))
         row, column = place_coord
         self.grid[int(row)][int(column)] = player_marker
     
@@ -48,18 +46,15 @@ class Board:
         return available_spaces
 
     def check_victory(self):
-        # check rows
         for row in self.grid:
             if row[0] == row[1] == row[2] != self.empty_marker:
                 return True, self.player_marker_to_number[row[0]]
 
-        # check columns
         for columns in range(len(self.grid)):
             column = [self.grid[0][columns], self.grid[1][columns], self.grid[2][columns]]
             if column[0] == column[1] == column[2] != self.empty_marker:
                 return True, self.player_marker_to_number[column[0]]
         
-        # check diagonals
         if self.grid[0][0] == self.grid[1][1] == self.grid[2][2] != self.empty_marker:
             return True, self.player_marker_to_number[self.grid[0][0]]
         
@@ -67,7 +62,3 @@ class Board:
             return True, self.player_marker_to_number[self.grid[0][2]]
 
         return False, None
-    
-    
-            
-            

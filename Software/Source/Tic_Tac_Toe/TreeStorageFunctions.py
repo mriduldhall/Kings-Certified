@@ -2,6 +2,7 @@ from pathlib import Path
 from os import fsync
 from linecache import getline
 
+
 class TreeStorageFunction:
     def __init__(self, max_depth=0, directory_name='TreeFiles', flush_interval=1000000, seperator=','):
         self.max_depth = max_depth
@@ -44,9 +45,9 @@ class TreeStorageFunction:
             line_contents = (line_contents[2], line_contents[7]), line_contents[11:12], line_contents[13:].strip()
         return line_contents
 
-    def coord_value(self, coord):
+    @staticmethod
+    def coord_value(coord):
         row, column = coord
-        # print("Coord value cood", coord)
         return int(row) * 3 + int(column)
 
     def get_layer(self, depth, line_start):
@@ -64,8 +65,6 @@ class TreeStorageFunction:
                 else:
                     layer.append([(line[2], line[7]), line[11:12], line[13:]])
                 line_num += 1
-                # print(line_num)
-                # print(layer[-1])
             line = lines[line_num]
             if line[11] == "-":
                 layer.append([(line[2], line[7]), line[11:13], line[14:]])
@@ -79,10 +78,3 @@ class TreeStorageFunction:
                 layer.append([(line[2], line[7]), line[11:12], line[13:]])
         
         return layer
-
-if __name__ == "__main__":
-    a = TreeStorageFunction()
-    depth = 2
-    start = 33
-    fin = 41   
-    print(a.get_layer(depth, start, fin))
