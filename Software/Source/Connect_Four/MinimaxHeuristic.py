@@ -13,19 +13,19 @@ class Minimax:
         scores = []
         for column in current_board.get_valid_moves():
             current_board.make_move(column, self.maximising_marker)
-            score = self.minimax(current_board.grid, False, str(column), 1)
+            score = self.minimax(current_board.grid, False, 1)
             scores.append((column, score))
             current_board.grid = self.deepcopy(state)
         return scores
 
-    def minimax(self, state, is_maximising, previous_moves, depth):
+    def minimax(self, state, is_maximising, depth):
         if depth >= self.max_depth:
             score = self.evaluate(state)
             return score
         scores = []
         lines_used = 0
         for possible_state, column in self.possible_new_states(state, is_maximising):
-            score = self.minimax(possible_state, not is_maximising, previous_moves + str(column), depth + 1)
+            score = self.minimax(possible_state, not is_maximising, depth + 1)
             if score is not None:
                 scores.append(score)
                 lines_used += 1
