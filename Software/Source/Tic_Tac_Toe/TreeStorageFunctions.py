@@ -1,5 +1,6 @@
 from pathlib import Path
 from os import fsync
+from os.path import isfile 
 from linecache import getline
 
 
@@ -45,6 +46,14 @@ class TreeStorageFunction:
             line_contents = (line_contents[2], line_contents[7]), line_contents[11:12], line_contents[13:].strip()
         return line_contents
 
+    def valid_tree(self):
+        files_are_valid = True
+        for file_number in range(1, self.max_depth + 1):
+            file_path = Path(str(self.directory_name + "/" + str(file_number) + ".txt"))
+            if not isfile(file_path):
+                files_are_valid = False 
+        return files_are_valid
+                
     @staticmethod
     def coord_value(coord):
         row, column = coord

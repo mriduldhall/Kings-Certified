@@ -3,12 +3,12 @@ from TreeStorageFunctions import TreeStorageFunction
 
 
 class Minimax:
-    def __init__(self, initial_state, maximising_marker, minimising_marker):
+    def __init__(self, initial_state, maximising_marker="O", minimising_marker="X"):
         self.initial_state = initial_state 
         self.maximising_marker = maximising_marker
         self.minimising_marker = minimising_marker
         self.is_maximising = False
-        self.storage_function = TreeStorageFunction()
+        self.storage_function = TreeStorageFunction(9)
         self.current_line = 1
         self.current_depth = 1
 
@@ -101,8 +101,6 @@ class Minimax:
                 self.current_depth += 1
                 self.current_line = int(child_nodes[count][2])
 
-
-if __name__ == "__main__":
-    a = Board()
-    b = Minimax(a.grid, "O", "X")
-    print(b.best_move(a.grid))
+    def generate_tree(self):
+        a = Board()
+        self.best_move(a.grid)
