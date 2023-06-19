@@ -19,8 +19,8 @@ class Minimax:
         return scores
 
     def minimax(self, state, is_maximising, depth):
-        if depth >= self.max_depth:
-            score = self.evaluate(state)
+        score = self.evaluate(state)
+        if (depth >= self.max_depth) or (score == float('inf')) or (score == float('-inf')):
             return score
         scores = []
         lines_used = 0
