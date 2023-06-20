@@ -72,7 +72,9 @@ void MoveArm(Move* move) {
   servo4.write(move->servoFourState);
   servo5.write(move->servoFiveState);
   servo6.write(move->servoSixState);
-  delay(1000);
+  delay(2000);
 
   Serial.println("Arrived");
+
+  delete move;
 }
