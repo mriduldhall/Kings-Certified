@@ -6,9 +6,11 @@ from Minimax import Minimax
 class Game:
     def __init__(self, rows=4, columns=5, empty=0, player_1=1, player_2=2, maximising_marker='R', minimising_marker=1):
         self.board = Board(rows, columns, empty, player_1, player_2, 'R')
-        self.minimax = Minimax(maximising_marker, minimising_marker, [rows, columns, empty, player_1, player_2, "R"])
+        self.player_begin = True
+        self.minimax = Minimax(maximising_marker, minimising_marker, [rows, columns, empty, player_1, player_2, "R"], self.player_begin)
         # self.minimax.load_tree()
         self.is_maximising = True
+
 
     def print_board(self):
         print('   |   '.join([str(column) for column in [col for col in range(self.board.number_of_columns)]]))
@@ -23,13 +25,13 @@ class Game:
             print("Invalid move.")
             column = input(f"Enter column (0 - {max_column}): ")
         self.board.make_move(int(column), marker)
-        self.minimax.follow_move_v2(int(column))
+        self.minimax.follow_move(int(column))
 
     def make_robot_move(self):
-        column = self.minimax.next_best_move_v2(self.is_maximising)
+        column = self.minimax.next_best_move(self.is_maximising)
         marker = self.board.player_number_to_marker["R"]
         self.board.make_move(column, marker)
-        self.minimax.follow_move_v2(column)
+        self.minimax.follow_move(column)
 
     def game_interface(self):
         is_player_game = input("Play against Robot or another Player: \n 1 for player \n 0 for robot\n")
@@ -48,12 +50,12 @@ class Game:
 
         print("")
 
-        # if p1_first_play == "0":
-        #     is_maximising = True
-        # else:
-        #     is_maximising = False
+        if p1_first_play == "0":
+            self.player_begin = False
+        else:
+            self.player_begin = True
 
-        # print("")
+        print("")
 
         is_player_game = int(is_player_game)
         p1_first_play = int(p1_first_play)
