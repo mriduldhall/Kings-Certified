@@ -1,5 +1,5 @@
 from Board import Board
-from MinimaxHeuristic import Minimax
+from Minimax import Minimax
 from Validator import Validator
 
 
@@ -88,6 +88,6 @@ class Game:
 
 
 if __name__ == '__main__':
-    game = Game()
     while True:
+        game = Game()
         game.play_game()
