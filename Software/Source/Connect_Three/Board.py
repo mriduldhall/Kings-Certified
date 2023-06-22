@@ -17,9 +17,6 @@ class Board:
             self.grid = grid
 
     def get_valid_moves(self):
-        """
-        :return: columns_available: list with the index of columns where move is available.
-        """
         columns_available = []
         for column in range(self.number_of_columns):
             if self.grid[0][column] == self.empty_marker:
@@ -27,11 +24,6 @@ class Board:
         return columns_available
 
     def make_move(self, column_number, player_marker):
-        """
-        :param column_number: (computer) index of the column you want to make move in
-        :param player_marker: the player mark you want to put in that column
-        :return: True: if the move made successfully; else: False
-        """
         assert column_number in self.get_valid_moves(), 'Move Request Should Be Valid!'
 
         grid_row_size = self.number_of_rows - 1

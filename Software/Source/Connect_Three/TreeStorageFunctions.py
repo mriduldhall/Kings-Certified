@@ -1,10 +1,12 @@
 from pathlib import Path
 from os import fsync
-import linecache
+from linecache import getline
+from itertools import islice
+from itertools import count as ct
 
 
 class TreeStorageFunction:
-    def __init__(self, max_depth=0, directory_name='TreeFiles', flush_interval=1000000, seperator=','):
+    def __init__(self, player_begin, directory_name="TreeFiles", max_depth=0, flush_interval=1000000, seperator=','):
         self.max_depth = max_depth
         self.directory_name = directory_name
         self.files = []
@@ -12,11 +14,14 @@ class TreeStorageFunction:
         self.append_count = 0
         self.flush_interval = flush_interval
         self.seperator = seperator
+        self.player_begin = player_begin #True if robot starts
 
     def initialise_files(self):
-        Path(self.directory_name).mkdir(parents=True, exist_ok=True)
+        directory_addon = "Player1" if self.player_begin else "Player2"
+        directory_name = self.directory_name + directory_addon
+        Path(directory_name).mkdir(parents=True, exist_ok=True)
         for file_number in range(self.max_depth):
-            self.files.append(open(self.directory_name + "/" + str(file_number + 1) + ".txt", "w"))
+            self.files.append(open(directory_name + "/" + str(file_number + 1) + ".txt", "w"))
             self.files_line_count.append(0)
 
     def refresh_files(self):
@@ -38,23 +43,37 @@ class TreeStorageFunction:
         return str(self.files_line_count[depth - 1])
 
     def read_node(self, depth, line):
-        line_contents = linecache.getline((self.directory_name + "/" + str(depth) + ".txt"), line)
+        directory_addon = "Player1" if self.player_begin else "Player2"
+        directory_name = self.directory_name + directory_addon
+        line_contents = getline((directory_name + "/" + str(depth) + ".txt"), line)
         return (line_contents.strip()).split(self.seperator)
 
-    def get_child_nodes_v1(self, depth, start_line, end_line):
+    def get_child_nodes(self, depth, start_line, end_line):
+        directory_addon = "Player1" if self.player_begin else "Player2"
+        directory_name = self.directory_name + directory_addon
         nodes = []
-        for current_line in range(start_line, end_line + 1):
-            nodes.append(self.read_node(depth, current_line))
+        with open((directory_name + "/" + str(depth) + ".txt"), 'r') as file_in:
+            line_generator = islice(file_in, start_line - 1, end_line - 1)
+            for line in line_generator:
+                nodes.append((line.rstrip('\n')).split(self.seperator))
         return nodes
 
-    def get_child_nodes_v2(self, depth, start_line):
-        nodes = []
-        counter = 0
-        while len(nodes) <= 5:
-            line_contents = self.read_node(depth, int(start_line) + counter)
-            if nodes:
-                if line_contents[0] <= nodes[-1][0]:
-                    return nodes
-            nodes.append(line_contents)
-            counter += 1
-        return nodes
+    def get_next_linevalue(self, depth, start_line, end_of_file):
+        directory_addon = "Player1" if self.player_begin else "Player2"
+        directory_name = self.directory_name + directory_addon
+        with open((directory_name + "/" + str(depth) + ".txt"), 'r') as file_in:
+            counter = 0
+            lines_to_skip = start_line
+            for _ in range(lines_to_skip):
+                counter += 1
+                next(file_in)
+            while counter < end_of_file:
+                print("EOF:", end_of_file)
+                counter += 1
+                line = str(next(file_in))
+                print("line:", line)
+                node = (line.rstrip('\n')).split(self.seperator)
+                if node[2]:
+                    file_in.close()
+                    return int(node[2])
+        return None
