@@ -1,13 +1,12 @@
 from Board import Board
-from Minimax import Minimax
+from MinimaxHeuristic import Minimax
 from Validator import Validator
 
 
 class Game:
-    def __init__(self, rows=6, columns=7, empty=0, player_1=1, player_2=2, maximising_marker='R', minimising_marker=1):
+    def __init__(self, rows=6, columns=7, empty=0, player_1=1, player_2=2, maximising_marker=2, minimising_marker=1):
         self.board = Board(rows, columns, empty, player_1, player_2, 'R')
         self.minimax = Minimax(maximising_marker, minimising_marker, [rows, columns, empty, player_1, player_2, "R"])
-        # self.minimax.load_tree()
 
     def print_board(self):
         print('   |   '.join([str(column) for column in [col for col in range(self.board.number_of_columns)]]))
@@ -25,13 +24,11 @@ class Game:
             print("Invalid move.")
             column = input(f"Enter column (0 - {max_column}): ")
         self.board.make_move(int(column), marker)
-        self.minimax.follow_move(int(column))
 
     def make_robot_move(self):
-        column = self.minimax.next_best_move(True)
+        column = self.minimax.next_best_move(self.board.grid)
         marker = self.board.player_number_to_marker["R"]
         self.board.make_move(column, marker)
-        self.minimax.follow_move(column)
 
     def play_game(self):
         is_player_game = input("Play against Robot or another Player: \n 1 for player \n 0 for robot\n")
@@ -93,13 +90,4 @@ class Game:
 if __name__ == '__main__':
     game = Game()
     while True:
-        game.board.grid = [
-        [0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 0, "R", 1, "R", "R"],
-        ["R", 1, "R", 1, "R", 1, 1],
-        [1, 1, "R", 1, "R", 1, "R"],
-        ["R", "R", 1, "R", "R", 1, 1],
-        ["R", 1, "R", 1, 1, "R", "R"],
-    ]
         game.play_game()
-        # game.minimax.current_node = game.minimax.tree
