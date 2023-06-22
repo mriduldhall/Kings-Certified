@@ -26,7 +26,8 @@ class Game:
         self.board.make_move(int(column), marker)
 
     def make_robot_move(self):
-        column = self.minimax.next_best_move(self.board.grid)
+        converted_board = self.minimax.convert_state(self.board.grid, self.board.robot_marker, 2)
+        column = self.minimax.next_best_move(converted_board)
         marker = self.board.player_number_to_marker["R"]
         self.board.make_move(column, marker)
 
@@ -85,9 +86,3 @@ class Game:
             print("Player 2 wins")
         else:
             print("Robot wins")
-
-
-if __name__ == '__main__':
-    while True:
-        game = Game()
-        game.play_game()

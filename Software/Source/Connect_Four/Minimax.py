@@ -9,6 +9,8 @@ class Minimax:
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
         self.max_depth = max_depth
+        self.one_increment_min_duration = 10
+        self.two_increment_min_duration = 5
 
     def best_move(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, self.deepcopy(state))
@@ -175,25 +177,24 @@ class Minimax:
             return float(player_one_score - player_two_score)
         return float(player_two_score - player_one_score)
 
-    def convert_state(self, state):
+    def convert_state(self, state, robot_marker, replacement):
         state = self.deepcopy(state)
         for column_index in range(len(state)):
             for row_index in range(len(state[column_index])):
-                if state[column_index][row_index] == "R":
-                    state[column_index][row_index] = 2
+                if state[column_index][row_index] == robot_marker:
+                    state[column_index][row_index] = replacement
         return state
 
     def next_best_move(self, state, is_maximising=True, update_depth=True):
-        state = self.convert_state(state)
         start_time = time()
         moves = self.best_move(state, is_maximising)
         if update_depth:
             end_time = time()
             duration = end_time - start_time
             print("DURATION", duration)
-            if duration < 7:
+            if duration < self.two_increment_min_duration:
                 self.max_depth += 2
-            elif duration < 15:
+            elif duration < self.one_increment_min_duration:
                 self.max_depth += 1
             print("DEPTH", self.max_depth)
         columns, scores = zip(*moves)
@@ -210,43 +211,3 @@ class Minimax:
             best_columns.append(columns[index])
         best_move = choice(best_columns)
         return best_move
-
-
-if __name__ == '__main__':
-    a = Board(rows=6, columns=7, empty=0, player_1=1, player_2=2, robot=2)
-    # a.grid = [
-    #     [0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0],
-    # ]
-    a.grid = [
-        [0, 0, 0, 0, 0, 0, 0],
-        [2, 0, 0, 1, 2, 1, 1],
-        [1, 2, 1, 2, 1, 2, 2],
-        [2, 2, 1, 2, 1, 2, 1],
-        [1, 1, 2, 1, 1, 2, 2],
-        [1, 2, 1, 2, 2, 1, 1],
-    ]
-    # a.grid = [
-    #     [2, 1, 2, 2, 0, 0, 0],
-    #     [2, 2, 1, 1, 2, 1, 1],
-    #     [1, 2, 1, 2, 1, 2, 2],
-    #     [2, 2, 1, 2, 1, 2, 1],
-    #     [1, 1, 2, 1, 1, 2, 2],
-    #     [1, 2, 1, 2, 2, 1, 1],
-    # ]
-    # a.grid = [
-    #     [2, 1, 0, 2, 2, 2, 0],
-    #     [2, 2, 1, 1, 2, 1, 1],
-    #     [1, 2, 1, 2, 1, 2, 1],
-    #     [2, 2, 1, 2, 1, 2, 1],
-    #     [1, 1, 2, 1, 1, 2, 2],
-    #     [1, 2, 1, 2, 2, 1, 1],
-    # ]
-
-    b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"], 6)
-    best, info = b.next_best_move(a.grid)
-    print(best)
