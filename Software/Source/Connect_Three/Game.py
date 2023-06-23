@@ -7,7 +7,6 @@ class Game:
     def __init__(self, rows=4, columns=5, empty=0, player_1=1, player_2=2, maximising_marker='R', minimising_marker=1):
         self.board = Board(rows, columns, empty, player_1, player_2, 'R')
         self.minimax = Minimax(maximising_marker, minimising_marker, [rows, columns, empty, player_1, player_2, "R"])
-        # self.minimax.load_tree()
         self.is_maximising = True
 
     def print_board(self):
@@ -23,13 +22,13 @@ class Game:
             print("Invalid move.")
             column = input(f"Enter column (0 - {max_column}): ")
         self.board.make_move(int(column), marker)
-        self.minimax.follow_move_v2(int(column))
+        self.minimax.follow_move(int(column))
 
     def make_robot_move(self):
-        column = self.minimax.next_best_move_v2(self.is_maximising)
+        column = self.minimax.next_best_move(self.is_maximising)
         marker = self.board.player_number_to_marker["R"]
         self.board.make_move(column, marker)
-        self.minimax.follow_move_v2(column)
+        self.minimax.follow_move(column)
 
     def game_interface(self):
         is_player_game = input("Play against Robot or another Player: \n 1 for player \n 0 for robot\n")
@@ -48,16 +47,17 @@ class Game:
 
         print("")
 
-        # if p1_first_play == "0":
-        #     is_maximising = True
-        # else:
-        #     is_maximising = False
-
-        # print("")
-
         is_player_game = int(is_player_game)
         p1_first_play = int(p1_first_play)
         current_turn = p1_first_play
+
+        if p1_first_play == 0:
+            print(self.minimax.storage_function.directory_name)
+            self.minimax.storage_function.directory_name += "Player1"   # player 1 is robot player
+        else:
+            self.minimax.storage_function.directory_name += "Player2"
+
+        self.minimax.files_line_count = self.minimax.storage_function.update_file_line_count()
 
         while not self.board.check_victory()[0] and (len(self.board.get_valid_moves()) > 0):
             self.print_board()
@@ -96,7 +96,9 @@ class Game:
 
     def play_game(self):
         play = "1"
-        self.minimax.update_file_line_count()
+        self.minimax.current_line = 1
+        self.minimax.last_line = 0
+        self.minimax.current_depth = 1
 
         while play == "1":
             self.board.grid = [
@@ -107,8 +109,8 @@ class Game:
             ]
 
             # self.board.grid = [
-            #         [0, 0, 0, 0, 0],
-            #         [0, 0, 0, 0, 0],
+            #         [1, 0, 0, 0, 0],
+            #         ["R", 0, 0, 0, 0],
             #         [1, 0, 0, 0, 0],
             #         ["R", 0, 0, 0, 0]
             # ]
@@ -127,18 +129,18 @@ class Game:
 if __name__ == '__main__':
     while True:
         game = Game()
-        print("Grid: ", game.board.grid)
+        # print("Grid: ", game.board.grid)
     #     game.board.grid = [
     #     [0, 0, 0, 0, 0],
     #     [0, 0, 0, 0, 0],
     #     [0, 0, 0, 0, 0],
     #     [0, 0, 0, 0, 0]
     # ]
-        game.board.grid = [
-        [0, 0, 0, 0, 0],
-        [1, 0, 0, "R", 1],
-        ["R", 1, "R", 1, "R"],
-        [1, 1, "R", 1, "R"]
-    ]
+    #     game.board.grid = [
+    #     [0, 0, 0, 0, 0],
+    #     [1, 0, 0, "R", 1],
+    #     ["R", 1, "R", 1, "R"],
+    #     [1, 1, "R", 1, "R"]
+    # ]
         game.play_game()
         # game.minimax.current_node = game.minimax.tree

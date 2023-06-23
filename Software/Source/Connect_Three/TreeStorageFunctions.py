@@ -2,15 +2,12 @@ from pathlib import Path
 from os import fsync
 from linecache import getline
 from itertools import islice
-from itertools import count as ct
 
 
 class TreeStorageFunction:
-    def __init__(self, max_depth=0, directory_name='TreeFiles', flush_interval=1000000, seperator=','):
+    def __init__(self, directory_name="TreeFiles", max_depth=0, flush_interval=1000000, seperator=','):
         self.max_depth = max_depth
         self.directory_name = directory_name
-        # self.directory_name = 'C:/Users/aryab/OneDrive - King\'s College London/King\'s Certificate/King Certified/Trees/Connect 3'
-        # self.directory_name = 'M:/KCLMS Server/Connect-3/TreeFiles'
         self.files = []
         self.files_line_count = []
         self.append_count = 0
@@ -45,27 +42,7 @@ class TreeStorageFunction:
         line_contents = getline((self.directory_name + "/" + str(depth) + ".txt"), line)
         return (line_contents.strip()).split(self.seperator)
 
-    def get_child_nodes_v1(self, depth, start_line, end_line):
-        nodes = []
-        for current_line in range(start_line, end_line + 1):
-            nodes.append(self.read_node(depth, current_line))
-        print("Nodes", nodes)
-        return nodes
-
-    def get_child_nodes_v2(self, depth, start_line):
-        nodes = []
-        counter = 0
-        while len(nodes) <= 5:
-            line_contents = self.read_node(depth, int(start_line) + counter)
-            if nodes:
-                if line_contents[0] <= nodes[-1][0]:
-                    return nodes
-            nodes.append(line_contents)
-            counter += 1
-        print("Nodes", nodes)
-        return nodes
-
-    def get_child_nodes_v3(self, depth, start_line, end_line):
+    def get_child_nodes(self, depth, start_line, end_line):
         nodes = []
         with open((self.directory_name + "/" + str(depth) + ".txt"), 'r') as file_in:
             line_generator = islice(file_in, start_line - 1, end_line - 1)
@@ -88,3 +65,10 @@ class TreeStorageFunction:
                     file_in.close()
                     return int(node[2])
         return None
+
+    def update_file_line_count(self):
+        with open((self.directory_name + "/0.txt"), 'r') as file:
+            files_line_count = file.read()
+            files_line_count = list(map(str.strip, files_line_count.strip('][').replace('"', '').split(',')))
+            return files_line_count
+
