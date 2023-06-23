@@ -1,55 +1,48 @@
 from Board import Board
-from TreeStorageFunctions import TreeStorageFunction
-import random
+from random import choice
+from time import process_time as time
 
 
 class Minimax:
-    def __init__(self, maximising_marker, minimising_marker, game_setup_arguments):
+    def __init__(self, maximising_marker, minimising_marker, game_setup_arguments, max_depth=6):
         self.maximising_marker = maximising_marker
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
-        self.storage_function = TreeStorageFunction()
-        self.current_line = 1
-        self.current_depth = 1
+        self.max_depth = max_depth
+        self.one_increment_min_duration = 10
+        self.two_increment_min_duration = 5
 
-    def best_move(self, state):
-        self.storage_function.max_depth = sum([row.count(self.game_setup_arguments[2]) for row in state])
-        self.storage_function.initialise_files()
+    def best_move(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, self.deepcopy(state))
         scores = []
         for column in current_board.get_valid_moves():
             current_board.make_move(column, self.maximising_marker)
-            score, line_number = self.minimax(current_board.grid, False, str(column), str(column), 1)
+            score = self.minimax(current_board.grid, not is_maximising, 1)
             scores.append((column, score))
             current_board.grid = self.deepcopy(state)
-        self.storage_function.close_files()
         return scores
 
-    def minimax(self, state, is_maximising, previous_move, previous_moves, depth):
-        if (score := self.evaluate(state)) is not None:
-            line_number = self.storage_function.write_node(str(previous_move), str(score), depth)
-            return score, line_number
+    def minimax(self, state, is_maximising, depth):
+        score = self.evaluate(state)
+        if (depth >= self.max_depth) or (score == float('inf')) or (score == float('-inf')):
+            return score
         scores = []
         lines_used = 0
-        line_number = 1
         for possible_state, column in self.possible_new_states(state, is_maximising):
-            score, line_number = self.minimax(possible_state, not is_maximising, column, previous_moves + str(column), depth + 1)
+            score = self.minimax(possible_state, not is_maximising, depth + 1)
             if score is not None:
                 scores.append(score)
                 lines_used += 1
-                if (is_maximising and score == 1) or (not is_maximising and score == -1):
+                if (is_maximising and score == float('inf')) or (not is_maximising and score == float('-inf')):
                     break
-        line_number = str(int(line_number) - lines_used + 1)
         if is_maximising:
             if scores:
-                line_number = self.storage_function.write_node(str(previous_move), str(max(scores)), depth, line_number)
-                return max(scores), line_number
-            return None, None
+                return max(scores)
+            return None
         else:
             if scores:
-                line_number = self.storage_function.write_node(str(previous_move), str(min(scores)), depth, line_number)
-                return min(scores), line_number
-            return None, None
+                return min(scores)
+            return None
 
     def possible_new_states(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, self.deepcopy(state))
@@ -63,70 +56,158 @@ class Minimax:
             current_board.grid = self.deepcopy(state)
         return zip(possible_states, columns)
 
-    def evaluate(self, state):
-        current_board = Board(*self.game_setup_arguments, state)
-        victory_status = current_board.check_victory()
-        if victory_status[0] is True or len(current_board.get_valid_moves()) == 0:
-            if victory_status[1] == self.maximising_marker:
-                return 1
-            elif victory_status[1] == self.minimising_marker:
-                return -1
-            return 0
-        return None
-
     @staticmethod
     def deepcopy(state):
         return [list(column) for column in state]
 
-    def next_best_move(self, is_maximising):
-        best_moves = []
-        child_nodes = self.storage_function.get_child_nodes_v2(self.current_depth, self.current_line)
-        child_scores = [int(node[1]) for node in child_nodes]
-        best_score = max(child_scores) if is_maximising else min(child_scores)
-        for node in child_nodes:
-            if int(node[1]) == best_score:
-                best_moves.append(node)
-        move = int(random.choice(best_moves)[0])
-        return move
+    @staticmethod
+    def sum_of_first_four_bits(x):
+        return (
+            0 if (x & 8) == 0 else 1
+        ) + (
+            0 if (x & 4) == 0 else 1
+        ) + (
+            0 if (x & 2) == 0 else 1
+        ) + (
+            0 if (x & 1) == 0 else 1
+        )
 
-    def follow_move(self, column):
-        child_nodes = self.storage_function.get_child_nodes_v2(self.current_depth, self.current_line)
-        for i in range(len(child_nodes)):
-            if int(child_nodes[i][0]) == column:
-                if not child_nodes[i][2]:
-                    print("Alpha beta error")
-                    return 0
-                self.current_depth += 1
-                self.current_line = child_nodes[i][2]
+    @staticmethod
+    def ix(row, col, dir):
+        return row * 7 * 4 + col * 4 + dir
 
+    @staticmethod
+    def append_to_streak(current_streak, current_spot_state):
+        if current_spot_state == -1:
+            return 0
+        elif current_streak == 0:
+            if current_spot_state == 0:
+                return 2
+            return 3
+        return (current_streak >> 4 << 4) | ((current_streak & 15) << 1) | current_spot_state
 
-if __name__ == '__main__':
-    a = Board(rows=6, columns=7, empty=0, player_1=1, player_2=2, robot='R')
-    a.grid = [
-        [0, 0, 0, 0, 0, 0, 0],
-        [2, 0, 0, 1, 2, 1, 1],
-        [1, 2, 1, 2, 1, 2, 2],
-        [2, 2, 1, 2, 1, 2, 1],
-        [1, 1, 2, 1, 1, 2, 2],
-        [1, 2, 1, 2, 2, 1, 1],
-    ]
-    # a.grid = [
-    #     [2, 1, 2, 2, 0, 0, 0],
-    #     [2, 2, 1, 1, 2, 1, 1],
-    #     [1, 2, 1, 2, 1, 2, 2],
-    #     [2, 2, 1, 2, 1, 2, 1],
-    #     [1, 1, 2, 1, 1, 2, 2],
-    #     [1, 2, 1, 2, 2, 1, 1],
-    # ]
-    # a.grid = [
-    #     [2, 1, 0, 2, 2, 2, 0],
-    #     [2, 2, 1, 1, 2, 1, 1],
-    #     [1, 2, 1, 2, 1, 2, 1],
-    #     [2, 2, 1, 2, 1, 2, 1],
-    #     [1, 1, 2, 1, 1, 2, 2],
-    #     [1, 2, 1, 2, 2, 1, 1],
-    # ]
+    def evaluate(self, connect_four_state: list[list[int]]) -> float:
+        movable_columns = [0] * 7
+        total_number_of_free_spots = 0
+        cumulative_board_player_one = [0] * 6 * 7 * 4
+        cumulative_board_player_two = [0] * 6 * 7 * 4
+        player_one_score = 0
+        player_two_score = 0
+        for row in range(6):
+            for col in range(7):
+                streak_vector_player_one = [
+                    0 if col == 0 else
+                    cumulative_board_player_one[
+                        self.ix(row, col - 1, 0)
+                    ],
+                    0 if (row == 0 or col == 0) else
+                    cumulative_board_player_one[
+                        self.ix(row - 1, col - 1, 1)
+                    ],
+                    0 if row == 0 else
+                    cumulative_board_player_one[
+                        self.ix(row - 1, col, 2)
+                    ],
+                    0 if (row == 0 or col == 6) else
+                    cumulative_board_player_one[
+                        self.ix(row - 1, col + 1, 3)
+                    ]
+                ]
+                streak_vector_player_two = [
+                    0 if col == 0 else
+                    cumulative_board_player_two[
+                        self.ix(row, col - 1, 0)
+                    ],
+                    0 if (row == 0 or col == 0) else
+                    cumulative_board_player_two[
+                        self.ix(row - 1, col - 1, 1)
+                    ],
+                    0 if row == 0 else
+                    cumulative_board_player_two[
+                        self.ix(row - 1, col, 2)
+                    ],
+                    0 if (row == 0 or col == 6) else
+                    cumulative_board_player_two[
+                        self.ix(row - 1, col + 1, 3)
+                    ]
+                ]
+                current_spot_state = connect_four_state[row][col]
+                current_spot_state = -1 if current_spot_state == 2 else current_spot_state
 
-    b = Minimax(1, 2, [6, 7, 0, 1, 2, "R"])
-    moves = b.best_move(a.grid)
-    print(moves)
+                if current_spot_state == 0:
+                    total_number_of_free_spots += 1
+                    movable_columns[col] = 1
+
+                new_streak_vector_player_one = [
+                    self.append_to_streak(streak_vector_player_one[0], current_spot_state),
+                    self.append_to_streak(streak_vector_player_one[1], current_spot_state),
+                    self.append_to_streak(streak_vector_player_one[2], current_spot_state),
+                    self.append_to_streak(streak_vector_player_one[3], current_spot_state)
+                ]
+                new_streak_vector_player_two = [
+                    self.append_to_streak(streak_vector_player_two[0], -current_spot_state),
+                    self.append_to_streak(streak_vector_player_two[1], -current_spot_state),
+                    self.append_to_streak(streak_vector_player_two[2], -current_spot_state),
+                    self.append_to_streak(streak_vector_player_two[3], -current_spot_state)
+                ]
+
+                for i in range(4):
+                    if new_streak_vector_player_one[i] >= 16:
+                        player_one_score += self.sum_of_first_four_bits(
+                            new_streak_vector_player_one[i]
+                        )
+                    if new_streak_vector_player_two[i] >= 16:
+                        player_two_score += self.sum_of_first_four_bits(
+                            new_streak_vector_player_two[i]
+                        )
+                for i in range(4):
+                    cumulative_board_player_one[self.ix(row, col, i)] = new_streak_vector_player_one[i]
+                    cumulative_board_player_two[self.ix(row, col, i)] = new_streak_vector_player_two[i]
+
+                if 31 in new_streak_vector_player_one:
+                    return float('inf') if self.maximising_marker == 1 else float('-inf')
+                if 31 in new_streak_vector_player_two:
+                    return float('inf') if self.maximising_marker == 2 else float('-inf')
+
+        if total_number_of_free_spots == 0:
+            if self.maximising_marker == 1:
+                return float(player_one_score - player_two_score)
+            return float(player_two_score - player_one_score)
+        if self.maximising_marker == 1:
+            return float(player_one_score - player_two_score)
+        return float(player_two_score - player_one_score)
+
+    def convert_state(self, state, robot_marker, replacement):
+        state = self.deepcopy(state)
+        for column_index in range(len(state)):
+            for row_index in range(len(state[column_index])):
+                if state[column_index][row_index] == robot_marker:
+                    state[column_index][row_index] = replacement
+        return state
+
+    def next_best_move(self, state, is_maximising=True, update_depth=True):
+        start_time = time()
+        moves = self.best_move(state, is_maximising)
+        if update_depth:
+            end_time = time()
+            duration = end_time - start_time
+            print("DURATION", duration)
+            if duration < self.two_increment_min_duration:
+                self.max_depth += 2
+            elif duration < self.one_increment_min_duration:
+                self.max_depth += 1
+            print("DEPTH", self.max_depth)
+        columns, scores = zip(*moves)
+        best_score = max(scores)
+        if scores.count(best_score) > 1:
+            best_score_index = []
+            for index in range(len(scores)):
+                if scores[index] == best_score:
+                    best_score_index.append(index)
+        else:
+            best_score_index = [scores.index(best_score)]
+        best_columns = []
+        for index in best_score_index:
+            best_columns.append(columns[index])
+        best_move = choice(best_columns)
+        return best_move
