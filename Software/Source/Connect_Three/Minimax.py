@@ -13,14 +13,14 @@ class Minimax:
         self.current_depth = 1
         self.files_line_count = []
 
-    def best_move(self, state):
+    def best_move(self, state, is_maximising):
         self.storage_function.max_depth = sum([row.count(self.game_setup_arguments[2]) for row in state])
         self.storage_function.initialise_files()
         current_board = Board(*self.game_setup_arguments, self.deepcopy(state))
         scores = []
         for column in current_board.get_valid_moves():
             current_board.make_move(column, self.maximising_marker)
-            score, line_number = self.minimax(current_board.grid, False, str(column), str(column), 1)
+            score, line_number = self.minimax(current_board.grid, not is_maximising, str(column), str(column), 1)
             scores.append((column, score))
             current_board.grid = self.deepcopy(state)
         self.storage_function.close_files()
@@ -120,9 +120,9 @@ if __name__ == '__main__':
     a = Board(rows=4, columns=5, empty=0, player_1=1, player_2=2, robot='R')
     a.grid = [
         [0, 0, 0, 0, 0],
-        [2, 0, 0, 1, 2],
-        [1, 2, 0, 2, 1],
-        [2, 2, 1, 2, 1]
+        [1, 0, 0, 2, 1],
+        [2, 1, 0, 1, 2],
+        [1, 1, 2, 1, 2]
     ]
 
     # a.grid = [
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     #     [1, 0, 0, 0, 0]
     # ]
 
-    b = Minimax(1, 2, [4, 5, 0, 1, 2, "R"])
-    moves = b.best_move(a.grid)
+    b = Minimax(2, 1, [4, 5, 0, 1, 2, "R"])
+    moves = b.best_move(a.grid, False)
     # cProfile.run('b.best_move(a.grid)')
     print(moves)
