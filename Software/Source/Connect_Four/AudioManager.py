@@ -38,117 +38,117 @@ class AudioManager:
 
     def play_connect_four_explain_ending(self):
         if self.connect_four_explain_ending:
-            playsound("SoundFiles/connect_4_explain_ending_conditions.wav", block=True)
+            playsound("SF/01.wav", block=True)
 
     def play_connect_four_explain_objective(self):
         if self.connect_four_explain_objective:
-            playsound("SoundFiles/connect_4_explain_objective.wav", block=True)
+            playsound("SF/02.wav", block=True)
 
     def play_connect_four_explain_play(self):
         if self.connect_four_explain_play:
-            playsound("SoundFiles/connect_4_explain_play.wav", block=True)
+            playsound("SF/03.wav", block=True)
 
     def play_connect_four_explain_setup(self):
         if self.connect_four_explain_setup:
-            playsound("SoundFiles/connect_4_explain_setup.wav", block=True)
+            playsound("SF/04.wav", block=True)
             self.instructions_counter += 1
 
     def play_connect_four_explain_tokens_setup(self):
         if self.connect_four_explain_tokens_setup:
-            playsound("SoundFiles/connect_4_explain_tokens.wav", block=True)
+            playsound("SF/05.wav", block=True)
 
     def play_connect_four_explain_winning(self):
         if self.connect_four_explain_winning:
-            playsound("SoundFiles/connect_4_explain_winning.wav", block=True)
+            playsound("SF/06.wav", block=True)
 
     def play_game_over(self):
         if self.game_over:
-            playsound("SoundFiles/game_over.wav", block=True)
+            playsound("SF/07.wav", block=True)
 
     def play_gg(self):
         if self.gg:
-            playsound("SoundFiles/gg.wav", block=True)
+            playsound("SF/08.wav", block=True)
             self.gg_occurred = True
 
     def play_good_move(self):
         if self.good_move:
-            playsound("SoundFiles/good_move.wav", block=True)
+            playsound("SF/09.wav", block=True)
 
     def play_hello_i_am_handy(self):
         if self.hello_i_am_handy:
-            playsound("SoundFiles/hello_i_am_handy.wav", block=True)
+            playsound("SF/10.wav", block=True)
 
     def play_hmm(self):
         if self.hmm:
-            playsound("SoundFiles/hmm.wav", block=False)
+            playsound("SF/11.wav", block=False)
 
     def play_hmm2(self):
         if self.hmm2:
-            playsound("SoundFiles/hmm2.wav", block=False)
+            playsound("SF/12.wav", block=False)
 
     def play_instructions_question(self):
         if self.instructions_question:
             if self.instructions_counter < 1:
-                playsound("SoundFiles/instructions_question.wav", block=False)
+                playsound("SF/13.wav", block=False)
             else:
-                playsound("SoundFiles/instructions_question_again.wav", block=False)
+                playsound("SF/14.wav", block=False)
 
     def play_its_your_move(self):
         if self.its_your_move:
-            playsound("SoundFiles/its_your_move.wav", block=False)
+            playsound("SF/15.wav", block=False)
 
     def play_kennedy_loses(self):
         if self.kennedy_loses:
-            playsound("SoundFiles/kennedy_loses.wav", block=True)
+            playsound("SF/16.wav", block=True)
 
     def play_kennedy_plays_red(self):
         if self.kennedy_plays_red:
-            playsound("SoundFiles/kennedy_plays_red.wav", block=True)
+            playsound("SF/17.wav", block=True)
 
     def play_kennedy_plays_yellow(self):
         if self.kennedy_plays_yellow:
-            playsound("SoundFiles/kennedy_plays_yellow.wav", block=True)
+            playsound("SF/18.wav", block=True)
 
     def play_kennedy_wins(self):
         if self.kennedy_wins:
-            playsound("SoundFiles/kennedy_wins.wav", block=True)
+            playsound("SF/19.wav", block=True)
 
     def play_loser(self):
         if self.loser:
-            playsound("SoundFiles/loser.wav", block=True)
+            playsound("SF/20.wav", block=True)
 
     def play_play_connect_four(self):
         if self.play_connect_four:
-            playsound("SoundFiles/play_connect_4.wav", block=True)
+            playsound("SF/21.wav", block=True)
 
     def play_praise_moloch(self):
         if self.praise_moloch:
-            playsound("SoundFiles/praise_moloch.wav", block=True)
+            playsound("SF/22.wav", block=True)
 
     def play_ready(self):
         if self.ready:
-            playsound("SoundFiles/ready.wav", block=True)
+            playsound("SF/23.wav", block=True)
 
     def play_rematch(self):
         if self.rematch:
-            playsound("SoundFiles/rematch.wav", block=False)
+            playsound("SF/24.wav", block=False)
 
     def play_robot_overlord_kennedy(self):
         if self.robot_overlord_kennedy:
-            playsound("SoundFiles/robot_overlord_kennedy.wav", block=True)
+            playsound("SF/25.wav", block=True)
 
     def play_terrible_move(self):
         if self.terrible_move:
-            playsound("SoundFiles/terrible_move.wav", block=True)
+            playsound("SF/26.wav", block=True)
 
     def play_tie(self):
         if self.tie:
-            playsound("SoundFiles/tie.wav", block=True)
+            playsound("SF/27.wav", block=True)
 
     def play_umm(self):
         if self.umm:
-            playsound("SoundFiles/umm.wav", block=True)
+            playsound("SF/28.wav", block=True)
 
     def play_well_played(self):
         if self.well_played:
-            playsound("SoundFiles/well_played.wav", block=True)
+            playsound("SF/29.wav", block=True)
