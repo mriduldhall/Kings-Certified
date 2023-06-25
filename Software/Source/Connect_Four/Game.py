@@ -59,6 +59,8 @@ class Game:
             if current_turn == 1:
                 print("Player 1 turn:")
                 self.make_player_move(1)
+                if not is_player_game:
+                    self.minimax.current_moves += 1
                 current_turn = 0
 
             elif current_turn == 0 and is_player_game:
@@ -69,6 +71,7 @@ class Game:
             elif current_turn == 0 and not is_player_game:
                 print("Robot turn:")
                 self.make_robot_move()
+                self.minimax.current_moves += 1
                 current_turn = 1
 
             else:

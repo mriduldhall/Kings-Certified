@@ -4,13 +4,15 @@ from time import process_time as time
 
 
 class Minimax:
-    def __init__(self, maximising_marker, minimising_marker, game_setup_arguments, max_depth=6):
+    def __init__(self, maximising_marker, minimising_marker, game_setup_arguments, max_depth=5):
         self.maximising_marker = maximising_marker
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
         self.max_depth = max_depth
         self.one_increment_min_duration = 10
         self.two_increment_min_duration = 5
+        self.current_moves = 0
+        self.min_moves_before_depth_increment = 15
 
     def best_move(self, state, is_maximising):
         current_board = Board(*self.game_setup_arguments, self.deepcopy(state))
@@ -192,10 +194,11 @@ class Minimax:
             end_time = time()
             duration = end_time - start_time
             print("DURATION", duration)
-            if duration < self.two_increment_min_duration:
-                self.max_depth += 2
-            elif duration < self.one_increment_min_duration:
-                self.max_depth += 1
+            if self.current_moves > self.min_moves_before_depth_increment:
+                if duration < self.two_increment_min_duration:
+                    self.max_depth += 2
+                elif duration < self.one_increment_min_duration:
+                    self.max_depth += 1
             print("DEPTH", self.max_depth)
         columns, scores = zip(*moves)
         best_score = max(scores)
