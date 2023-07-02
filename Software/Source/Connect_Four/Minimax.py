@@ -4,7 +4,7 @@ from time import process_time as time
 
 
 class Minimax:
-    def __init__(self, maximising_marker, minimising_marker, game_setup_arguments, max_depth=6):
+    def __init__(self, maximising_marker, minimising_marker, game_setup_arguments, max_depth=5):
         self.maximising_marker = maximising_marker
         self.minimising_marker = minimising_marker
         self.game_setup_arguments = game_setup_arguments
