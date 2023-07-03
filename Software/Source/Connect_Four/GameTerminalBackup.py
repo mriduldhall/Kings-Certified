@@ -20,7 +20,7 @@ class Game:
     def print_board(self):
         print('   |   '.join([str(column) for column in [col for col in range(self.board.number_of_columns)]]))
         print("".join(['-' for _ in range(self.board.number_of_columns * 7)]))
-        print('\n'.join(['       '.join([str(cell) for cell in row]) for row in self.board.grid]))
+        print('\n'.join(['       '.join(["\033[0;31m"+str(cell)+"\033[0m" if str(cell) == 'R' else "\033[0;32m"+str(cell)+"\033[0m" if str(cell) == '1' else str(cell) for cell in row]) for row in self.board.grid]))
 
     def make_player_move(self, player_number):
         """
