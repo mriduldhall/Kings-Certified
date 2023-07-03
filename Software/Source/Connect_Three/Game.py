@@ -1,13 +1,88 @@
 from Board import Board
-from Validator import Validator
 from Minimax import Minimax
+from socket import socket, AF_INET, SOCK_STREAM
 
 
 class Game:
+    HOST = "127.0.0.1"
+    PORT = 65431
+
     def __init__(self, rows=4, columns=5, empty=0, player_1=1, player_2=2, maximising_marker='R', minimising_marker=1):
+        self.board = None
+        self.minimax = None
+        self.is_maximising = None
+        self.current_turn = None
+        self.server = None
+        self.client = None
+        self.setup_socket()
+        self.reset(rows, columns, empty, player_1, player_2, maximising_marker, minimising_marker)
+
+    def reset(self, rows, columns, empty, player_1, player_2, maximising_marker, minimising_marker):
         self.board = Board(rows, columns, empty, player_1, player_2, 'R')
         self.minimax = Minimax(maximising_marker, minimising_marker, [rows, columns, empty, player_1, player_2, "R"])
         self.is_maximising = True
+        self.minimax.current_line = 1
+        self.minimax.last_line = 0
+        self.minimax.current_depth = 1
+
+    def setup_socket(self):
+        self.server = socket(AF_INET, SOCK_STREAM)
+        self.server.bind((self.HOST, self.PORT))
+        print("Listening")
+
+    def wait_for_client(self):
+        self.server.listen()
+        self.client, client_address = self.server.accept()
+        print(client_address)
+
+    def close_client(self):
+        self.client.close()
+
+    def close_socket(self):
+        self.server.close()
+
+    def send_message(self, message):
+        self.client.sendall(message.encode())
+
+    def receive_message(self):
+        invalid_flag = True
+        while invalid_flag:
+            message = self.client.recv(7).decode()
+            flag = message[:4]
+            if flag != "COLM" or (flag == "COLM" and self.current_turn == 1):
+                invalid_flag = False
+            elif flag == "COLM":
+                self.send_message("GAMEZNZ")
+        character_one = message[4]
+        if character_one == "Z":
+            character_one = None
+        character_two = message[5]
+        if character_two == "Z":
+            character_two = None
+        character_three = message[6]
+        if character_three == "Z":
+            character_three = None
+        return [flag, character_one, character_two, character_three]
+
+    def execute_play(self, parameters):
+        if int(parameters[0]) == 1:
+            return True
+        return False
+
+    def execute_colm(self, parameters):
+        column = int(parameters[0])
+        valid_columns = self.board.get_valid_moves()
+        if column in valid_columns:
+            return column
+        self.send_message("GAMEZNZ")
+        return None
+
+    def decode_message(self, message_code):
+        message_codes = {
+            "PLAY": self.execute_play,
+            "COLM": self.execute_colm,
+        }
+        return message_codes.get(message_code)
 
     def print_board(self):
         print('   |   '.join([str(column) for column in [col for col in range(self.board.number_of_columns)]]))
@@ -15,132 +90,91 @@ class Game:
         print('\n'.join(['       '.join(["\033[0;31m"+str(cell)+"\033[0m" if str(cell) == 'R' else "\033[0;32m"+str(cell)+"\033[0m" if str(cell) == '1' else str(cell) for cell in row]) for row in self.board.grid]))
 
     def make_player_move(self, player_number):
-        max_column = self.board.number_of_columns - 1
-        column = (input(f"Enter column (0 - {max_column}): "))
+        column = None
+        while column is None:
+            message = self.receive_message()
+            func = self.decode_message(message[0])
+            column = func([message[1], message[2], message[3]])
         marker = self.board.player_number_to_marker[player_number]
-        while not Validator(column).type_validation(int) or (int(column) not in self.board.get_valid_moves()):
-            print("Invalid move.")
-            column = input(f"Enter column (0 - {max_column}): ")
         self.board.make_move(int(column), marker)
         self.minimax.follow_move(int(column))
+        self.send_message("GAME" + str(column) + "YZ")
 
     def make_robot_move(self):
         column = self.minimax.next_best_move(self.is_maximising)
         marker = self.board.player_number_to_marker["R"]
         self.board.make_move(column, marker)
         self.minimax.follow_move(column)
+        self.send_message("GAME" + str(column) + "YZ")
 
     def game_interface(self):
-        is_player_game = input("Play against Robot or another Player: \n 1 for player \n 0 for robot\n")
-        while not Validator(is_player_game).option_validator(["0", "1"]):
-            is_player_game = input("Error. Please input 1 or 0. \n"
-                                   "Play against Robot or another Player: \n"
-                                   " 1 for player \n 0 for robot\n")
+        message = self.receive_message()
+        funct = self.decode_message(message[0])
+        p1_first_play = funct([message[1], message[2], message[3]])
 
-        print("")
-
-        p1_first_play = input("Who plays first? \n 1 - I start first \n 0 - Opponent starts\n")
-        while not Validator(p1_first_play).option_validator(["0", "1"]):
-            p1_first_play = input("Error. Please input 1 or 0. \n"
-                                  "Who plays first: \n"
-                                  " 1 - I start first \n 0 - Opponent starts\n")
-
-        print("")
-
-        is_player_game = int(is_player_game)
         p1_first_play = int(p1_first_play)
-        current_turn = p1_first_play
+        self.current_turn = p1_first_play
 
-        if p1_first_play == 0:
-            print(self.minimax.storage_function.directory_name)
-            self.minimax.storage_function.directory_name += "Player1"   # player 1 is robot player
-        else:
-            self.minimax.storage_function.directory_name += "Player2"
+        self.minimax.storage_function.directory_name += "Player1"
 
         self.minimax.files_line_count = self.minimax.storage_function.update_file_line_count()
 
         while not self.board.check_victory()[0] and (len(self.board.get_valid_moves()) > 0):
+            self.send_message("STAT" + str(self.current_turn) + "NZ")
+
             self.print_board()
             print("")
 
-            if current_turn == 1:
+            if self.current_turn == 1:
                 print("Player 1 turn:")
                 self.make_player_move(1)
-                current_turn = 0
+                self.current_turn = 0
 
-            elif current_turn == 0 and is_player_game:
-                print("Player 2 turn:")
-                self.make_player_move(2)
-                current_turn = 1
-
-            elif current_turn == 0 and not is_player_game:
+            elif self.current_turn == 0:
                 print("Robot turn:")
                 self.make_robot_move()
-                current_turn = 1
+                self.current_turn = 1
 
             else:
                 print("Error")
 
         self.print_board()
 
-        winner = not current_turn
+        winner = not self.current_turn
+        self.send_message("STAT" + str(int(winner)) + "YZ")
 
         if not self.board.get_valid_moves() and not self.board.check_victory()[0]:
             print("Draw")
         elif winner:
             print("Player 1 wins")
-        elif is_player_game:
-            print("Player 2 wins")
         else:
             print("Robot wins")
 
     def play_game(self):
         play = "1"
-        self.minimax.current_line = 1
-        self.minimax.last_line = 0
-        self.minimax.current_depth = 1
+        self.wait_for_client()
 
         while play == "1":
-            self.board.grid = [
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0]
-    ]
-
-            # self.board.grid = [
-            #         [1, 0, 0, 0, 0],
-            #         ["R", 0, 0, 0, 0],
-            #         [1, 0, 0, 0, 0],
-            #         ["R", 0, 0, 0, 0]
-            # ]
-            print("Grid: ", self.board.grid)
             self.game_interface()
+
+            self.reset(
+                self.board.number_of_rows,
+                self.board.number_of_columns,
+                self.board.empty_marker,
+                self.board.player_1_marker,
+                self.board.player_2_marker,
+                self.minimax.maximising_marker,
+                self.minimax.minimising_marker,
+            )
+            self.close_client()
 
             play = input("Play again: \n 1 for yes \n 0 for no\n")
             while play != "0" and play != "1":
                 play = input("\nWould you like to play again?\n"
                              "1 yes\n"
                              "0 no \n")
+            if play == "1":
+                self.wait_for_client()
 
         print("Thanks for playing!")
-
-
-if __name__ == '__main__':
-    while True:
-        game = Game()
-        # print("Grid: ", game.board.grid)
-    #     game.board.grid = [
-    #     [0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0]
-    # ]
-    #     game.board.grid = [
-    #     [0, 0, 0, 0, 0],
-    #     [1, 0, 0, "R", 1],
-    #     ["R", 1, "R", 1, "R"],
-    #     [1, 1, "R", 1, "R"]
-    # ]
-        game.play_game()
-        # game.minimax.current_node = game.minimax.tree
+        self.close_socket()
