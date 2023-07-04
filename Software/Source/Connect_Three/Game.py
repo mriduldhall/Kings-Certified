@@ -50,7 +50,8 @@ class Game:
     def receive_message(self):
         invalid_flag = True
         while invalid_flag:
-            message = self.client.recv(7).decode()
+            message = self.client.recv(11).decode()
+            message = message[4:]
             flag = message[:4]
             if flag != "COLM" or (flag == "COLM" and self.current_turn == 1):
                 invalid_flag = False

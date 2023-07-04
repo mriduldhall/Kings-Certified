@@ -8,7 +8,7 @@ from socket import socket, AF_INET, SOCK_STREAM
 
 class Game:
     HOST = "127.0.0.1"
-    PORT = 65431
+    PORT = 65432
 
     def __init__(self, rows=6, columns=7, empty=0, player_1=1, player_2=2, maximising_marker=2, minimising_marker=1):
         self.board = None
@@ -48,7 +48,8 @@ class Game:
     def receive_message(self):
         invalid_flag = True
         while invalid_flag:
-            message = self.client.recv(7).decode()
+            message = self.client.recv(11).decode()
+            message = message[4:]
             flag = message[:4]
             if flag != "COLM" or (flag == "COLM" and self.current_turn == 1):
                 invalid_flag = False
