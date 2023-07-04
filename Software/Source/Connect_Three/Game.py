@@ -1,7 +1,8 @@
 from Board import Board
 from Minimax import Minimax
 from socket import socket, AF_INET, SOCK_STREAM
-
+from AudioManager import AudioManager
+from random import randint
 
 class Game:
     HOST = "127.0.0.1"
@@ -15,6 +16,7 @@ class Game:
         self.server = None
         self.client = None
         self.setup_socket()
+        self.audio_manager = AudioManager()
         self.reset(rows, columns, empty, player_1, player_2, maximising_marker, minimising_marker)
 
     def reset(self, rows, columns, empty, player_1, player_2, maximising_marker, minimising_marker):
@@ -24,6 +26,7 @@ class Game:
         self.minimax.current_line = 1
         self.minimax.last_line = 0
         self.minimax.current_depth = 1
+        self.audio_manager.gg_occurred = False
 
     def setup_socket(self):
         self.server = socket(AF_INET, SOCK_STREAM)
@@ -119,6 +122,9 @@ class Game:
 
         self.minimax.files_line_count = self.minimax.storage_function.update_file_line_count()
 
+        self.audio_manager.play_play_connect_three()
+        self.audio_manager.play_galbiati_plays_red()
+
         while not self.board.check_victory()[0] and (len(self.board.get_valid_moves()) > 0):
             self.send_message("STAT" + str(self.current_turn) + "NZ")
 
@@ -126,9 +132,13 @@ class Game:
             print("")
 
             if self.current_turn == 1:
+                if randint(1, 100) < 35:
+                    self.audio_manager.play_its_your_move()
                 print("Player 1 turn:")
                 self.make_player_move(1)
                 self.current_turn = 0
+                if randint(1, 100) < 20:
+                    self.audio_manager.play_lol_really()
 
             elif self.current_turn == 0:
                 print("Robot turn:")
@@ -145,14 +155,22 @@ class Game:
 
         if not self.board.get_valid_moves() and not self.board.check_victory()[0]:
             print("Draw")
+            self.audio_manager.play_tie()
+
         elif winner:
             print("Player 1 wins")
+            self.audio_manager.play_galbiati_loses()
+
         else:
             print("Robot wins")
+            self.audio_manager.play_galbiati_wins()
+            self.audio_manager.play_loser()
+            self.audio_manager.play_pathetic_humans()
 
     def play_game(self):
         play = "1"
         self.wait_for_client()
+        self.audio_manager.play_hello_i_am_riccardino()
 
         while play == "1":
             self.game_interface()
